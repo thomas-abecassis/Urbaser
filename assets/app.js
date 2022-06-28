@@ -12,8 +12,8 @@ import './styles/app.css';
 import './bootstrap';
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Home from './components/Home';
     
-ReactDOM.render(<Router><Home /></Router>, document.getElementById('root'));
+ReactDOM.createRoot(document.getElementById('root')).render(<Home />);
