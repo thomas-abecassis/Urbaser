@@ -1,3 +1,23 @@
 body {
     background-color: lightgray;
 }
+
+.vh-100 {
+    height: 100vh;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+.bg-urbagrey {
+    background-color: #8b8b8b;
+}
+
+.bg-urbagreen {
+    background-color: #99cc00;
+}
+
+.bg-urbablue {
+    background-color: #000080;
+}
