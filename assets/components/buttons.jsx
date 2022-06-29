@@ -7,8 +7,8 @@ class Buttons extends Component {
         super();
 
         this.state = {
-            loaded: false,
-            buttonsArray: {}
+            loaded: true,
+            buttonsArray: this.getButtons()
         }
     }
 
