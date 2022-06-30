@@ -47,15 +47,15 @@ Encore
     // enables hashed filenames (e.g. app.abc123.css)
     .enableVersioning(Encore.isProduction())
 
-    .configureBabel((config) => {
-        config.plugins.push('@babel/plugin-proposal-class-properties');
-    })
+    //.configureBabel((config) => {
+    //    config.plugins.push('@babel/plugin-proposal-class-properties');
+    //})
 
     // enables @babel/preset-env polyfills
-    .configureBabelPresetEnv((config) => {
-        config.useBuiltIns = 'usage';
-        config.corejs = 3;
-    })
+    //.configureBabelPresetEnv((config) => {
+    //    config.useBuiltIns = 'usage';
+    //    config.corejs = 3;
+    //})
 
     // enables Sass/SCSS support
     //.enableSassLoader()
@@ -76,7 +76,8 @@ Encore
 
 
 module.exports = {
-    entry: './src/app.js',
+    mode: "development",
+    entry: './assets/app.js',
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist')
@@ -110,7 +111,31 @@ module.exports = {
                         loader: 'sass-loader'
                     }
                 ]
-            }
+            },
+            {
+                test: /\.(js|jsx)$/,
+                use: [
+                    {
+                        loader: 'babel-loader'
+                    }
+                ]
+            },
+            {
+                test: /\.(css)$/,
+                use: [
+                    {
+                        loader: 'css-loader'
+                    }
+                ]
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/i,
+                use: [
+                    {
+                        loader: 'file-loader',
+                    },
+                ],
+            },
         ]
     }
 };
