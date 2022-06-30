@@ -79,8 +79,8 @@ module.exports = {
     mode: "development",
     entry: './assets/app.js',
     output: {
-        filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist')
+        filename: 'app.js',
+        path: path.resolve(__dirname, 'public/build')
     },
     module: {
         rules: [
@@ -122,11 +122,7 @@ module.exports = {
             },
             {
                 test: /\.(css)$/,
-                use: [
-                    {
-                        loader: 'css-loader'
-                    }
-                ]
+                use: ['style-loader', 'css-loader']
             },
             {
                 test: /\.(png|jpe?g|gif)$/i,

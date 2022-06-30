@@ -1,4 +1,8 @@
-$primary: #000;
-$secondary: #111;
+/* import the necessary Bootstrap files */
+@import "../../node_modules/bootstrap/scss/functions";
 
-@import "node_modules/bootstrap/scss/bootstrap";
+$primary: red;
+$danger: #ff4136;
+
+
+@import "../../node_modules/bootstrap/scss/bootstrap";
