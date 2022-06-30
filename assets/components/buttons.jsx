@@ -7,8 +7,8 @@ class Buttons extends Component {
         super();
 
         this.state = {
-            loaded: true,
-            buttonsArray: this.getButtons()
+            loaded: false,
+            buttonsArray: []
         }
     }
 
@@ -32,15 +32,16 @@ class Buttons extends Component {
 
     componentDidMount() {
         //à changer en production
-        fetch("localhost:8000/api/tools")
+        fetch("/api/tools")
             .then(res => res.json())
             .then(
                 (result) => {
                     this.setState({ loaded: true, buttonsArray: result });
                 },
                 (error) => {
+                    console.trace(error)
                     this.setState({
-                        isLoaded: true,
+                        loaded: true,
                         error
                     });
                 }
@@ -48,22 +49,17 @@ class Buttons extends Component {
     }
 
 
-    componentDidMount() {
-        console.log("hello")
-
-    }
-
 
     render() {
         return (
             this.state.loaded ?
-                <div className="d-grid gap-2">{this.state.buttonsArray.map(button => (
+                <div className=" d-grid gap-2">{this.state.buttonsArray.map(button => (
                     <Button key={button.name} name={button.name} url={button.url}>
                     </Button>
                 ))}</div>
                 :
-                <div className="spinner-border" role="status">
-                    <span className="sr-only">Loading...</span>
+                <div className="d-block text-primary spinner-border mx-auto" style={{ width: "5rem", height: "5rem" }} role="status" >
+                    <span className="sr-only"></span>
                 </div>
         )
     }

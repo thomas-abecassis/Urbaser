@@ -9,7 +9,7 @@ class Home extends Component {
         return (
             <div className="vh-100 d-flex flex-column">
                 <nav className="navbar navbar-lg navbar-light bg-light">
-                    <a className="navbar-brand" href="#">
+                    <a className="navbar-brand ms-5" href="#">
                         <img src={logo} width="50" height="50" className="d-inline-block align-top" alt="" />
                     </a>
                 </nav>
