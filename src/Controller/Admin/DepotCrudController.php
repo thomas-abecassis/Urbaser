@@ -2,17 +2,16 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Button;
+use App\Entity\Depot;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 
-class ButtonCrudController extends AbstractCrudController
+class DepotCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return Button::class;
+        return Depot::class;
     }
 
 
@@ -20,8 +19,8 @@ class ButtonCrudController extends AbstractCrudController
     {
         return [
             TextField::new('name'),
-            TextField::new('url'),
-            AssociationField::new("depot"),
+            TextField::new('slug'),
+            AssociationField::new('buttons'),
         ];
     }
 }

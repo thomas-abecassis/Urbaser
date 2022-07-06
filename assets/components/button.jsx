@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
 
 function Button(props) {
@@ -9,4 +9,4 @@ function Button(props) {
     )
 }
 
-export default Button;
+export default Button

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Depot;
 use App\Entity\Button;
 use App\Controller\Admin\ButtonCrudController;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,6 +33,7 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('The Label', 'fas fa-toolbox', Button::class);
+        yield MenuItem::linkToCrud('Outils', 'fas fa-toolbox', Button::class);
+        yield MenuItem::linkToCrud('Depots', 'fas fa-building', Depot::class);
     }
 }

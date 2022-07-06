@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
-import { Route, Switch, Redirect, Link, withRouter } from 'react-router-dom';
+import React, { Component } from 'react'
+import { Route, Switch, Redirect, Link, withRouter, Router, BrowserRouter } from 'react-router-dom'
 import Buttons from './buttons.jsx'
-import logo from '../../public/ressources/images/logo.png';
+import logo from '../../public/ressources/images/logo.png'
+import { useSearchParams } from "react-router-dom"
 
-class Home extends Component {
+function Home() {
 
-    render() {
-        return (
+    return (
+        <BrowserRouter>
             <div className="vh-100 d-flex flex-column">
                 <nav className="navbar navbar-lg navbar-light bg-light">
                     <a className="navbar-brand ms-5" href="#">
@@ -23,8 +24,9 @@ class Home extends Component {
                     </div>
                 </div>
             </div >
-        )
-    }
+        </BrowserRouter >
+    )
 }
 
-export default Home;
+
+export default Home
