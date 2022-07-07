@@ -24,6 +24,9 @@ class Depot
     #[ORM\ManyToMany(targetEntity: Button::class, mappedBy: 'depot')]
     private $buttons;
 
+    #[ORM\OneToOne(mappedBy: 'depot', targetEntity: Background::class, cascade: ['persist', 'remove'])]
+    private $background;
+
     public function __construct()
     {
         $this->buttons = new ArrayCollection();
@@ -88,5 +91,27 @@ class Depot
     public function __toString()
     {
         return $this->getName();
+    }
+
+    public function getBackground(): ?Background
+    {
+        return $this->background;
+    }
+
+    public function setBackground(?Background $background): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($background === null && $this->background !== null) {
+            $this->background->setDepot(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($background !== null && $background->getDepot() !== $this) {
+            $background->setDepot($this);
+        }
+
+        $this->background = $background;
+
+        return $this;
     }
 }

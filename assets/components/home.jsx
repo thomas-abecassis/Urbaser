@@ -1,18 +1,11 @@
-import React, { Component } from 'react'
-import {
-  Route,
-  Switch,
-  Redirect,
-  Link,
-  withRouter,
-  Router,
-  BrowserRouter,
-} from 'react-router-dom'
+import React, { useState } from 'react'
+import { BrowserRouter } from 'react-router-dom'
 import Buttons from './buttons.jsx'
 import logo from '../../public/ressources/images/logo.png'
-import { useSearchParams } from 'react-router-dom'
 
 function Home() {
+  let [error, setError] = useState(false)
+
   return (
     <BrowserRouter>
       <div className="vh-100 d-flex flex-column">
@@ -34,9 +27,14 @@ function Home() {
               "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://mdbootstrap.com/img/Photos/Others/images/76.jpg')",
           }}
         >
+          {error && (
+            <div className="mt-2 alert alert-danger" role="alert">
+              Il semblerait que le dépot fournit dans l'URL n'existe pas
+            </div>
+          )}
           <div className="row justify-content-md-center align-items-center h-100">
             <div className="col col-lg-6">
-              <Buttons />
+              <Buttons setError={setError} />
             </div>
           </div>
         </div>

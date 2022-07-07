@@ -1,17 +1,16 @@
-import React, { Component, useEffect, useState } from 'react'
+import React, { Component, Fragment, useEffect, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import Button from './button.jsx'
 
-//get url GET parameters
-function useQuery() {
-  const { search } = useLocation()
-
-  return React.useMemo(() => new URLSearchParams(search), [search])
+//get url GET parameters with rewrite (corresponding of our depot)
+function getDepot() {
+  var params = window.location.pathname.split('/').slice(1)
+  console.log(params)
+  return params
 }
 
 function Buttons(props) {
-  let query = useQuery()
-  let depot = query.get('depot')
+  let depot = getDepot()
 
   let [loaded, setLoaded] = useState(false)
   let [buttonsArray, setButtonsArray] = useState([])
@@ -27,18 +26,27 @@ function Buttons(props) {
         },
         (error) => {
           console.trace(error)
-          setLoaded(false)
-          setButtonsArray(error)
+          setLoaded(true)
+          setButtonsArray(-1)
+          props.setError(true)
         }
       )
   }, [])
 
   return loaded ? (
-    <div className=" d-grid gap-2">
-      {buttonsArray.map((button) => (
-        <Button key={button.name} name={button.name} url={button.url}></Button>
-      ))}
-    </div>
+    buttonsArray == -1 ? (
+      <Fragment></Fragment>
+    ) : (
+      <div className=" d-grid gap-2">
+        {buttonsArray.map((button) => (
+          <Button
+            key={button.name}
+            name={button.name}
+            url={button.url}
+          ></Button>
+        ))}
+      </div>
+    )
   ) : (
     <div
       className="d-block text-primary spinner-border mx-auto"

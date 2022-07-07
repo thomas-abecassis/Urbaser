@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Depot;
 use App\Entity\Button;
 use App\Controller\Admin\ButtonCrudController;
+use App\Entity\Background;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -35,5 +36,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Outils', 'fas fa-toolbox', Button::class);
         yield MenuItem::linkToCrud('Depots', 'fas fa-building', Depot::class);
+        yield MenuItem::linkToCrud('Backgroungs', 'fas fa-image', Background::class);
     }
 }
