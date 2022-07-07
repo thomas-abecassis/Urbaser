@@ -3,6 +3,11 @@ import { BrowserRouter } from 'react-router-dom'
 import Buttons from './buttons.jsx'
 import logo from '../../public/ressources/images/logo.png'
 
+function getImg() {
+  let bg = document.querySelector('.js-background')
+  return bg.dataset.background
+}
+
 function Home() {
   let [error, setError] = useState(false)
 
@@ -24,7 +29,9 @@ function Home() {
           className="container-fluid flex-grow-1 bg-image"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://mdbootstrap.com/img/Photos/Others/images/76.jpg')",
+              "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/uploads/" +
+              getImg() +
+              "')",
           }}
         >
           {error && (
