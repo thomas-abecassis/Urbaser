@@ -19,7 +19,7 @@ class BackgroundCrudController extends AbstractCrudController
     {
         return [
             ImageField::new("illustration")->setUploadDir('public/uploads')->setBasePath('uploads')
-                ->setUploadedFileNamePattern('[randomhash],[extension]'),
+                ->setUploadedFileNamePattern('[randomhash].[extension]'),
                 AssociationField::new("depot"),
         ];
     }

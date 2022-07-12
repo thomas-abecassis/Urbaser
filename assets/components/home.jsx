@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import React, { Fragment, useState } from 'react'
+import { Link, Outlet } from 'react-router-dom'
 import Buttons from './buttons.jsx'
+import Login from './login.jsx'
 import logo from '../../public/ressources/images/logo.png'
 
 function getImg() {
@@ -12,7 +13,7 @@ function Home() {
   let [error, setError] = useState(false)
 
   return (
-    <BrowserRouter>
+    <Fragment>
       <div className="vh-100 d-flex flex-column">
         <nav className="navbar navbar-lg navbar-light bg-light">
           <a className="navbar-brand ms-5" href="#">
@@ -32,6 +33,7 @@ function Home() {
               "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/uploads/" +
               getImg() +
               "')",
+            backgroundSize: 'cover',
           }}
         >
           {error && (
@@ -46,7 +48,18 @@ function Home() {
           </div>
         </div>
       </div>
-    </BrowserRouter>
+      <Login></Login>
+      <footer className="fixed-bottom text-center p-3 ">
+        <a
+          href="#"
+          className="link-secondary"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+        >
+          Login
+        </a>
+      </footer>
+    </Fragment>
   )
 }
 
