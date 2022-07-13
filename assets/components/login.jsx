@@ -20,8 +20,8 @@ function Login() {
               aria-label="Close"
             ></button>
           </div>
-          <div className="modal-body">
-            <form method="post">
+          <form method="post">
+            <div className="modal-body">
               <label htmlFor="inputUsername">Username</label>
               <input
                 type="text"
@@ -47,24 +47,20 @@ function Login() {
                 name="_csrf_token"
                 value="{{ csrf_token('authenticate') }}"
               />
-
-              <button className="btn btn-lg btn-primary" type="submit">
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="submit" className="btn btn-primary">
                 Connexion
               </button>
-            </form>
-          </div>
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" className="btn btn-primary">
-              Connexion
-            </button>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>

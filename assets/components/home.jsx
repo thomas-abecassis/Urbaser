@@ -27,7 +27,7 @@ function Home() {
           </a>
         </nav>
         <div
-          className="container-fluid flex-grow-1 bg-image"
+          className="container-fluid d-flex flex-column flex-grow-1 bg-image"
           style={{
             backgroundImage:
               "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/uploads/" +
@@ -41,7 +41,7 @@ function Home() {
               Il semblerait que le dépot fournit dans l'URL n'existe pas
             </div>
           )}
-          <div className="row justify-content-md-center align-items-center h-100">
+          <div className="row justify-content-md-center align-items-center flex-grow-1">
             <div className="col col-lg-6">
               <Buttons setError={setError} />
             </div>
