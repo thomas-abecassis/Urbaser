@@ -23,7 +23,6 @@ class HomeController extends AbstractController
      */
     public function index($depotSlug): Response
     {
-
         $repoDepot = $this->entityManager->getRepository(Depot::class);
         $depot = $repoDepot->findOneBySlug($depotSlug);
         $img = "defaultBackground.jpg";

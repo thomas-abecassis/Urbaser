@@ -1,6 +1,35 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 function Login() {
+  let [token, setToken] = useState()
+
+  let init = {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username: 'toto', password: 'tata' }),
+  }
+
+  useEffect(() => {
+    //à changer en production
+    fetch('/api/login_check', init)
+      .then((response) => response.json())
+      .then(
+        (response) => {
+          console.log(response)
+          setToken(response)
+        },
+        (error) => {
+          console.trace(error)
+          setLoaded(true)
+          setButtonsArray(-1)
+          props.setError(true)
+        }
+      )
+  }, [])
+
   return (
     <div
       className="modal fade"
@@ -12,7 +41,7 @@ function Login() {
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 class="modal-title">Connexion</h5>
+            <h5 className="modal-title">Connexion</h5>
             <button
               type="button"
               className="btn-close"
