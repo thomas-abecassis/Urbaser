@@ -1,8 +1,8 @@
 import React, { Fragment, useState } from 'react'
-import { Link, Outlet } from 'react-router-dom'
 import Buttons from './buttons.jsx'
 import Login from './login.jsx'
 import logo from '../../public/ressources/images/logo.png'
+import ButtonAdmin from './buttonAdmin.jsx'
 
 function getImg() {
   let bg = document.querySelector('.js-background')
@@ -11,6 +11,7 @@ function getImg() {
 
 function Home() {
   let [error, setError] = useState(false)
+  let [login, setLogin] = useState(false)
 
   return (
     <Fragment>
@@ -47,14 +48,15 @@ function Home() {
             </div>
           </div>
         </div>
+        {login && <ButtonAdmin></ButtonAdmin>}
       </div>
-      <Login></Login>
+      <Login setLogin={setLogin}></Login>
       <footer className="fixed-bottom text-center p-3 ">
         <a
           href="#"
           className="link-secondary"
           data-bs-toggle="modal"
-          data-bs-target="#exampleModal"
+          data-bs-target="#modalLogin"
         >
           Login
         </a>

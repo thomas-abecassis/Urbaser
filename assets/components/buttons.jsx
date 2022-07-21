@@ -25,7 +25,6 @@ function Buttons(props) {
           setButtonsArray(response)
         },
         (error) => {
-          console.trace(error)
           setLoaded(true)
           setButtonsArray(-1)
           props.setError(true)
