@@ -8,6 +8,7 @@
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css'
 
+// start the Stimulus application
 window.bootstrap = require('bootstrap/dist/js/bootstrap.bundle.js')
 
 import React from 'react'

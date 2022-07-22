@@ -31,9 +31,6 @@ class ListenerAdmin implements EventSubscriberInterface
 
     private function hashPassword($admin){        
 
-
-        $this->logger->info($password=$admin->getPassword());
-
         if (!($admin instanceof Admin)) {
             return;
         }

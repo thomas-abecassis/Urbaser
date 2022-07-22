@@ -10,7 +10,6 @@ function getTokenStorage() {
 }
 
 function Login(props) {
-  let [token, setToken] = useState()
   let [crentials, setCrentials] = useState({
     username: '',
     password: '',
@@ -21,6 +20,13 @@ function Login(props) {
     setCrentials({ ...crentials, [name]: value })
   }
 
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    sendCrentials()
+  }
+
+  //envoit username + mot de passe à l'api, si la combinaison est bonne le serveur renvoie un token JWT et on le set,
+  // si elle est mauvaise on set le token a -1, si le serveur a une erreur a -2
   const sendCrentials = () => {
     let init = {
       method: 'POST',
@@ -34,48 +40,44 @@ function Login(props) {
     return fetch('/api/login_check', init).then((response) => {
       if (response.status == 401) {
         //Si on met le mauvais mot de passe
-        setToken(-1)
+        props.setToken(-1)
       } else
         return response.json().then(
           (json) => {
             //Bon mot de passe
-            setToken(json.token)
+            props.setToken(json.token)
           },
           (error) => {
-            setToken(-2)
+            //erreur du serveur
+            props.setToken(-2)
           }
         )
     })
   }
-
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    sendCrentials()
-  }
-
+  //appelé au début de cycle de vie du component, on regarde si l'utilisateur s'est déjà connecté précedemment,
+  //si c'est le cas le token JWT est présent dans le localstorage
   useEffect(() => {
     let token = getTokenStorage()
-
-    if (token !== null) {
-      props.setLogin(true)
-      return
-    }
+    props.setToken(token)
   }, [])
 
+  //A la connexion on met à jour le localstorage, cache le modal et set la variable login
+  //A la deconnexion on retire le token du localstorage
   useEffect(() => {
-    if (token && token !== -2 && token !== -1) {
+    if (props.isLogin()) {
       var object = {
-        token: token,
+        token: props.token,
         expiration: new Date().getTime() + 2629800000,
       } //now + 1 month in ms
       localStorage.setItem('urbaconnectToken', JSON.stringify(object))
       let modalLogin = bootstrap.Modal.getInstance(
         document.getElementById('modalLogin')
       )
-      modalLogin.hide()
-      props.setLogin(true)
+      if (modalLogin) modalLogin.hide()
+    } else {
+      localStorage.removeItem('urbaconnectToken')
     }
-  }, [token])
+  }, [props.token])
 
   return (
     <div
@@ -125,12 +127,12 @@ function Login(props) {
                 name="_csrf_token"
                 value="{{ csrf_token('authenticate') }}"
               />
-              {token == -1 && (
+              {props.token == -1 && (
                 <p className="mt-1 d-block text-danger">
                   Nom d'utilisateur ou mot de passe erroné(s)
                 </p>
               )}
-              {token == -2 && (
+              {props.token == -2 && (
                 <p className="mt-1 d-block text-danger">
                   Problème de communication avec le serveur
                 </p>
