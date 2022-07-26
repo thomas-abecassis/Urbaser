@@ -27,7 +27,7 @@ class HomeController extends AbstractController
         $depot = $repoDepot->findOneBySlug($depotSlug);
         $img = "defaultBackground.jpg";
         if($depot)
-            $img = $depot->getBackground()->getIllustration();
+            $img = $depot->getImage();
         
 
         return $this->render('home/index.html.twig', [
@@ -35,3 +35,4 @@ class HomeController extends AbstractController
         ]);
     }
 }
+    

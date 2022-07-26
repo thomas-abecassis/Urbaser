@@ -4,8 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\Depot;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
 class DepotCrudController extends AbstractCrudController
 {
@@ -21,6 +22,8 @@ class DepotCrudController extends AbstractCrudController
             TextField::new('name'),
             TextField::new('slug'),
             AssociationField::new('buttons'),
+            ImageField::new("image")->setUploadDir('public/uploads')->setBasePath('uploads')
+            ->setUploadedFileNamePattern('[randomhash].[extension]'),
         ];
     }
 }

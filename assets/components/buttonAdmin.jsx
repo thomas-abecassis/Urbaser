@@ -1,7 +1,59 @@
 import React, { Fragment, Component, useState } from 'react'
 
+function sendData(apiCall, data, auth = null) {
+  let formData = new FormData()
+
+  for (var key in data) {
+    formData.append(key, data[key])
+  }
+
+  for (var key of formData.keys()) {
+    console.log(key)
+  }
+
+  let init = {
+    method: 'POST',
+    body: formData,
+    headers: {},
+  }
+
+  if (auth) {
+    init.headers.Authorization = 'Bearer ' + auth
+  }
+
+  return fetch('/api/' + apiCall, init).then((response) => {
+    if (response.status !== 200) {
+      return -1
+    } else
+      return response.text().then(
+        (text) => {
+          return text
+        },
+        (error) => {
+          return -2
+        }
+      )
+  })
+}
+
 function ButtonAdmin(props) {
   let [image, setImage] = useState(null)
+  let [errorImage, setErrorImage] = useState(false)
+
+  const handleClickImage = (event) => {
+    event.preventDefault()
+    sendData(
+      'uploadImage',
+      { image: image, depot: props.depot },
+      props.token
+    ).then((ret) => {
+      if (ret == '-1') {
+        setErrorImage(true)
+      } else {
+        props.setBackground(ret)
+      }
+    })
+  }
 
   return (
     <Fragment>
@@ -35,11 +87,17 @@ function ButtonAdmin(props) {
                     setImage(event.target.files[0])
                   }}
                 />
+                {errorImage && (
+                  <div className="mt-2 alert alert-danger" role="alert">
+                    Erreur lors de l'envoi de l'image au serveur
+                  </div>
+                )}
                 {image && (
                   <Fragment>
                     <button
                       type="button"
                       className="mt-2 me-2 btn btn-secondary"
+                      onClick={handleClickImage}
                     >
                       Valider
                     </button>
@@ -57,18 +115,6 @@ function ButtonAdmin(props) {
                 {props.loaded &&
                   props.buttonsArray !== -1 &&
                   props.buttonsArray.map((button) => button.name)}
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Connexion
-                </button>
               </div>
             </form>
           </div>

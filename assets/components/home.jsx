@@ -11,7 +11,7 @@ function getImg() {
 
 //get url GET parameters with rewrite (corresponding of our depot)
 function getDepot() {
-  var params = window.location.pathname.split('/').slice(1)
+  var params = window.location.pathname.split('/').slice(1)[0]
   return params
 }
 
@@ -20,12 +20,17 @@ function Home() {
   let [token, setToken] = useState()
   let [loaded, setLoaded] = useState(false)
   let [buttonsArray, setButtonsArray] = useState([])
+  let [depot, setDepot] = useState(null)
+  let [background, setBackground] = useState(null)
 
   useEffect(() => {
-    let depot = getDepot()
+    setBackground(getImg())
+
+    let dpt = getDepot()
+    setDepot(dpt)
 
     //à changer en production
-    fetch('/api/tools/' + depot)
+    fetch('/api/tools/' + dpt)
       .then((response) => response.json())
       .then(
         (response) => {
@@ -63,7 +68,7 @@ function Home() {
           style={{
             backgroundImage:
               "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/uploads/" +
-              getImg() +
+              background +
               "')",
             backgroundSize: 'cover',
           }}
@@ -79,10 +84,13 @@ function Home() {
             </div>
           </div>
         </div>
-        {isLogin() && (
+        {isLogin() && depot && (
           <ButtonAdmin
+            token={token}
             loaded={loaded}
             buttonsArray={buttonsArray}
+            depot={depot}
+            setBackground={setBackground}
           ></ButtonAdmin>
         )}
       </div>
