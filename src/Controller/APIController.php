@@ -76,7 +76,8 @@ class APIController extends AbstractController
         foreach ($buttons as $button) {
             array_push($buttonsArray, [
                 "name" => $button->getName(),
-                "url" => $button->getUrl()
+                "url" => $button->getUrl(),
+                "id" => $button->getId(),
             ]);
         }
 

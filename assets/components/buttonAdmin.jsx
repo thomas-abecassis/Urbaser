@@ -77,12 +77,11 @@ function ButtonAdmin(props) {
             </div>
             <form method="post">
               <div className="modal-body">
-                <label htmlFor="inputUsername">Image de fond</label>
+                <label class="form-label">Image de fond</label>
                 <input
-                  id="imageInput"
                   type="file"
                   name="image"
-                  className="form-control"
+                  className=" mb-3 form-control"
                   onChange={(event) => {
                     setImage(event.target.files[0])
                   }}
@@ -93,10 +92,10 @@ function ButtonAdmin(props) {
                   </div>
                 )}
                 {image && (
-                  <Fragment>
+                  <div className="d-block">
                     <button
                       type="button"
-                      className="mt-2 me-2 btn btn-secondary"
+                      className=" mb-3 me-2 btn btn-secondary"
                       onClick={handleClickImage}
                     >
                       Valider
@@ -106,15 +105,34 @@ function ButtonAdmin(props) {
                         setImage(null)
                         document.getElementById('imageInput').value = ''
                       }}
-                      className="mt-2 btn btn-danger"
+                      className="mb-3 btn btn-danger"
                     >
                       Supprimer
                     </button>
-                  </Fragment>
+                  </div>
                 )}
+                <label class="form-label">Outils</label>
                 {props.loaded &&
                   props.buttonsArray !== -1 &&
-                  props.buttonsArray.map((button) => button.name)}
+                  props.buttonsArray.map((button) => (
+                    <div
+                      className="input-group mb-3"
+                      key={'button' + button.id}
+                    >
+                      <input
+                        type="text"
+                        className="form-control"
+                        defaultValue={button.name}
+                        aria-label="Username"
+                      />
+                      <input
+                        type="text"
+                        className="form-control"
+                        defaultValue={button.url}
+                        aria-label="Username"
+                      />
+                    </div>
+                  ))}
               </div>
             </form>
           </div>
