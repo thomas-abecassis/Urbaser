@@ -59,6 +59,24 @@ function ButtonAdmin(props) {
     })
   }
 
+  const handleClickTools = (event) => {
+    event.preventDefault()
+    sendData(
+      'uploadTools',
+      {
+        tools: JSON.stringify(newButtons),
+        depot: props.depot,
+      },
+      props.token
+    ).then((ret) => {
+      if (ret == '-1') {
+        setError(true)
+      } else {
+        props.setButtonsArray(JSON.parse(JSON.stringify(newButtons)))
+      }
+    })
+  }
+
   useEffect(() => {
     setNewButtons(JSON.parse(JSON.stringify(props.buttonsArray))) //deep copy
   }, [])
@@ -151,25 +169,7 @@ function ButtonAdmin(props) {
                     <button
                       type="button"
                       className=" mb-3 me-2 btn btn-secondary"
-                      onClick={(event) => {
-                        event.preventDefault()
-                        sendData(
-                          'uploadTools',
-                          {
-                            tools: JSON.stringify(newButtons),
-                            depot: props.depot,
-                          },
-                          props.token
-                        ).then((ret) => {
-                          if (ret == '-1') {
-                            setError(true)
-                          } else {
-                            props.setButtonsArray(
-                              JSON.parse(JSON.stringify(newButtons))
-                            )
-                          }
-                        })
-                      }}
+                      onClick={handleClickTools}
                     >
                       Valider
                     </button>
