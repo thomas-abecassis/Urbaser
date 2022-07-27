@@ -1,14 +1,10 @@
-import React, { Fragment, Component, useState } from 'react'
+import React, { Fragment, Component, useState, useEffect } from 'react'
 
 function sendData(apiCall, data, auth = null) {
   let formData = new FormData()
 
   for (var key in data) {
     formData.append(key, data[key])
-  }
-
-  for (var key of formData.keys()) {
-    console.log(key)
   }
 
   let init = {
@@ -36,9 +32,16 @@ function sendData(apiCall, data, auth = null) {
   })
 }
 
+function deepComparison(array1, array2) {
+  let arrString1 = JSON.stringify(array1)
+  let arrString2 = JSON.stringify(array2)
+  return arrString1 == arrString2
+}
+
 function ButtonAdmin(props) {
-  let [image, setImage] = useState(null)
-  let [errorImage, setErrorImage] = useState(false)
+  const [image, setImage] = useState(null)
+  const [newButtons, setNewButtons] = useState([])
+  const [error, setError] = useState(false)
 
   const handleClickImage = (event) => {
     event.preventDefault()
@@ -51,9 +54,14 @@ function ButtonAdmin(props) {
         setErrorImage(true)
       } else {
         props.setBackground(ret)
+        setImage(null)
       }
     })
   }
+
+  useEffect(() => {
+    setNewButtons(JSON.parse(JSON.stringify(props.buttonsArray))) //deep copy
+  }, [])
 
   return (
     <Fragment>
@@ -77,7 +85,12 @@ function ButtonAdmin(props) {
             </div>
             <form method="post">
               <div className="modal-body">
-                <label class="form-label">Image de fond</label>
+                {error && (
+                  <div className="mt-2 alert alert-danger" role="alert">
+                    Erreur lors de l'envoi au serveur
+                  </div>
+                )}
+                <label className="form-label">Image de fond</label>
                 <input
                   type="file"
                   name="image"
@@ -86,11 +99,6 @@ function ButtonAdmin(props) {
                     setImage(event.target.files[0])
                   }}
                 />
-                {errorImage && (
-                  <div className="mt-2 alert alert-danger" role="alert">
-                    Erreur lors de l'envoi de l'image au serveur
-                  </div>
-                )}
                 {image && (
                   <div className="d-block">
                     <button
@@ -107,32 +115,76 @@ function ButtonAdmin(props) {
                       }}
                       className="mb-3 btn btn-danger"
                     >
-                      Supprimer
+                      Annuler
                     </button>
                   </div>
                 )}
-                <label class="form-label">Outils</label>
-                {props.loaded &&
-                  props.buttonsArray !== -1 &&
-                  props.buttonsArray.map((button) => (
-                    <div
-                      className="input-group mb-3"
-                      key={'button' + button.id}
+                <label className="form-label">Outils</label>
+                {newButtons.map((button, index) => (
+                  <div className="input-group mb-3" key={'button' + button.id}>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={button.name}
+                      aria-label="nom outil"
+                      onChange={(event) => {
+                        let arrCopy = [...newButtons]
+                        arrCopy[index].name = event.target.value
+                        setNewButtons(arrCopy)
+                      }}
+                    />
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={button.url}
+                      aria-label="url outil"
+                      onChange={(event) => {
+                        let arrCopy = [...newButtons]
+                        arrCopy[index].url = event.target.value
+                        setNewButtons(arrCopy)
+                      }}
+                    />
+                  </div>
+                ))}
+                {!deepComparison(props.buttonsArray, newButtons) && (
+                  <div className="d-block">
+                    <button
+                      type="button"
+                      className=" mb-3 me-2 btn btn-secondary"
+                      onClick={(event) => {
+                        event.preventDefault()
+                        sendData(
+                          'uploadTools',
+                          {
+                            tools: JSON.stringify(newButtons),
+                            depot: props.depot,
+                          },
+                          props.token
+                        ).then((ret) => {
+                          if (ret == '-1') {
+                            setError(true)
+                          } else {
+                            props.setButtonsArray(
+                              JSON.parse(JSON.stringify(newButtons))
+                            )
+                          }
+                        })
+                      }}
                     >
-                      <input
-                        type="text"
-                        className="form-control"
-                        defaultValue={button.name}
-                        aria-label="Username"
-                      />
-                      <input
-                        type="text"
-                        className="form-control"
-                        defaultValue={button.url}
-                        aria-label="Username"
-                      />
-                    </div>
-                  ))}
+                      Valider
+                    </button>
+                    <button
+                      onClick={() => {
+                        setNewButtons(
+                          JSON.parse(JSON.stringify(props.buttonsArray))
+                        )
+                      }}
+                      className="mb-3 btn btn-danger"
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                )}
               </div>
             </form>
           </div>

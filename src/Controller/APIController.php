@@ -60,6 +60,39 @@ class APIController extends AbstractController
         return $response->setContent($newFilename);
     }
 
+            /**
+     * @Route("/api/uploadTools", name="api_uploadTools")
+     */
+    public function uploadTools( Request $request, SluggerInterface $slugger)
+    {
+
+        $response = new Response();
+
+        $depotSlug = $request->request->get('depot');
+
+        $repoDepot = $this->entityManager->getRepository(Depot::class);
+        $repoButton = $this->entityManager->getRepository(Button::class);
+
+
+        $depot = $repoDepot->findOneBySlug($depotSlug);
+
+        if (!$depot) return $response->setContent(-1);
+
+        $buttonsUpload = json_decode($request->request->get('tools'));
+
+        foreach ($buttonsUpload as  $buttonUpload) {
+            $prevButton = $repoButton->findOneById($buttonUpload->id);
+            if($prevButton){
+                $prevButton->setName($buttonUpload->name);
+                $prevButton->setUrl($buttonUpload->url);
+                $this->entityManager->persist($prevButton);
+            }   
+        }
+        $this->entityManager->flush();
+
+        return $response->setContent(1);
+    }
+
     /**
      * @Route("/api/tools/{depotSlug}", name="api_tools")
      * @return \Symfony\Component\HttpFoundation\JsonResponse

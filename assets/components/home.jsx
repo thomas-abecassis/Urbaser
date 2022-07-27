@@ -84,13 +84,13 @@ function Home() {
             </div>
           </div>
         </div>
-        {isLogin() && depot && (
+        {isLogin() && depot && loaded && (
           <ButtonAdmin
             token={token}
-            loaded={loaded}
             buttonsArray={buttonsArray}
             depot={depot}
             setBackground={setBackground}
+            setButtonsArray={setButtonsArray}
           ></ButtonAdmin>
         )}
       </div>
