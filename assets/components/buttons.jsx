@@ -3,16 +3,11 @@ import { useLocation, useSearchParams } from 'react-router-dom'
 import Button from './button.jsx'
 
 function Buttons(props) {
-  console.log(props.buttonsArray)
   return props.loaded ? (
     props.buttonsArray !== -1 && (
       <div className=" d-grid gap-2">
         {props.buttonsArray.map((button) => (
-          <Button
-            key={button.name}
-            name={button.name}
-            url={button.url}
-          ></Button>
+          <Button key={button.id} name={button.name} url={button.url}></Button>
         ))}
       </div>
     )

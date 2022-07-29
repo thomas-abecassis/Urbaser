@@ -27,9 +27,13 @@ class Depot
     #[ORM\Column(type: 'string', length: 255)]
     private $image;
 
+    #[ORM\OneToMany(mappedBy: 'depot', targetEntity: AdminDepot::class)]
+    private $adminDepots;
+
     public function __construct()
     {
         $this->buttons = new ArrayCollection();
+        $this->adminDepots = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -101,6 +105,36 @@ class Depot
     public function setImage(string $image): self
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AdminDepot>
+     */
+    public function getAdminDepots(): Collection
+    {
+        return $this->adminDepots;
+    }
+
+    public function addAdminDepot(AdminDepot $adminDepot): self
+    {
+        if (!$this->adminDepots->contains($adminDepot)) {
+            $this->adminDepots[] = $adminDepot;
+            $adminDepot->setDepot($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAdminDepot(AdminDepot $adminDepot): self
+    {
+        if ($this->adminDepots->removeElement($adminDepot)) {
+            // set the owning side to null (unless already changed)
+            if ($adminDepot->getDepot() === $this) {
+                $adminDepot->setDepot(null);
+            }
+        }
 
         return $this;
     }

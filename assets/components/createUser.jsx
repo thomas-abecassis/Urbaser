@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import { sendData } from './Utils.js'
 
-function setTokenLocalStorage(token) {
-  var object = {
-    token: token,
-    expiration: new Date().getTime() + 2629800000,
-  } //now + 1 month in ms
-  localStorage.setItem('urbaconnectToken', JSON.stringify(object))
-}
-
-function Login(props) {
+function CreateUser(props) {
+  let [returnCode, setReturnCode] = useState(0)
   let [credentials, setCredentials] = useState({
     username: '',
     password: '',
@@ -21,62 +15,32 @@ function Login(props) {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    sendCrentials()
+    setReturnCode(0)
+    sendNewUser()
   }
 
-  //envoit username + mot de passe à l'api, si la combinaison est bonne le serveur renvoie un token JWT et on le set,
-  // si elle est mauvaise on set le token a -1, si le serveur a une erreur a -2
-  const sendCrentials = () => {
-    let init = {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    }
-
-    return fetch('/api/login_check', init).then((response) => {
-      if (response.status == 401) {
-        //Si on met le mauvais mot de passe
-        props.setToken(-1)
-      } else
-        return response.json().then(
-          (json) => {
-            //Bon mot de passe
-            props.setToken(json.token)
-          },
-          (error) => {
-            //erreur du serveur
-            props.setToken(-2)
-          }
-        )
+  const sendNewUser = () => {
+    sendData(
+      '/api/admin/createUser',
+      { credentials: JSON.stringify(credentials) },
+      props.token
+    ).then((ret) => {
+      setReturnCode(ret.code)
     })
   }
-  //A la connexion on met à jour le localstorage, cache le modal et set la variable login
-  //A la deconnexion on retire le token du localstorage
-  useEffect(() => {
-    if (props.token && props.token !== -1 && props.token !== -2) {
-      setTokenLocalStorage(props.token)
-      let modalLogin = bootstrap.Modal.getInstance(
-        document.getElementById('modalLogin')
-      )
-      if (modalLogin) modalLogin.hide()
-    }
-  }, [props.token])
 
   return (
     <div
       className="modal fade"
-      id="modalLogin"
+      id="modalCreateUser"
       tabIndex="-1"
-      aria-labelledby="modalLoginLabel"
+      aria-labelledby="modalCreateUserLabel"
       aria-hidden="true"
     >
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Connexion</h5>
+            <h5 className="modal-title">Créer un admin</h5>
             <button
               type="button"
               className="btn-close"
@@ -86,7 +50,7 @@ function Login(props) {
           </div>
           <form method="post">
             <div className="modal-body">
-              <label htmlFor="inputUsername">Username</label>
+              <label htmlFor="inputUsername">Nom d'utilisateur</label>
               <input
                 type="text"
                 name="username"
@@ -97,7 +61,7 @@ function Login(props) {
                 autoFocus
                 onChange={handleChange}
               />
-              <label htmlFor="inputPassword">Password</label>
+              <label htmlFor="inputPassword">Mot de passe</label>
               <input
                 type="password"
                 name="password"
@@ -107,14 +71,22 @@ function Login(props) {
                 required
                 onChange={handleChange}
               />
-              {props.token == -1 && (
-                <p className="mt-1 d-block text-danger">
-                  Nom d'utilisateur ou mot de passe erroné(s)
-                </p>
+              {returnCode == 1 && (
+                <p className="mt-1 d-block text-success">Utilisateur créé </p>
               )}
-              {props.token == -2 && (
+              {returnCode == -1 && (
                 <p className="mt-1 d-block text-danger">
                   Problème de communication avec le serveur
+                </p>
+              )}
+              {returnCode == -2 && (
+                <p className="mt-1 d-block text-danger">
+                  Problème de communication avec le serveur
+                </p>
+              )}
+              {returnCode == -3 && (
+                <p className="mt-1 d-block text-danger">
+                  Nom d'utilisateur déjà existant
                 </p>
               )}
             </div>
@@ -125,14 +97,14 @@ function Login(props) {
                 className="btn btn-secondary"
                 data-bs-dismiss="modal"
               >
-                Close
+                Fermer
               </button>
               <button
                 onClick={handleSubmit}
                 type="submit"
                 className="btn btn-primary"
               >
-                Connexion
+                Créer l'utilisateur
               </button>
             </div>
           </form>
@@ -142,4 +114,4 @@ function Login(props) {
   )
 }
 
-export default Login
+export default CreateUser

@@ -2,13 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\AdminRepository;
+use App\Repository\AdminDepotRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Entity\Depot;
 
-#[ORM\Entity(repositoryClass: AdminRepository::class)]
-class Admin implements UserInterface, PasswordAuthenticatedUserInterface
+
+#[ORM\Entity(repositoryClass: AdminDepotRepository::class)]
+class AdminDepot implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,11 +26,9 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string')]
     private $password;
 
-    public function __construct($username, $password)
-    {
-        $this->username=$username;
-        $this->password=$password;
-    }
+    #[ORM\ManyToOne(targetEntity: Depot::class, inversedBy: 'adminDepots')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $depot;
 
     public function getId(): ?int
     {
@@ -65,9 +65,8 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-        $roles[] = 'ROLE_ADMIN';
         $roles[] = 'ROLE_ADMIN_DEPOT';
-        
+
         return array_unique($roles);
     }
 
@@ -102,8 +101,15 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function __toString()
+    public function getDepot(): ?depot
     {
-        return $this->username;
+        return $this->depot;
+    }
+
+    public function setDepot(?depot $depot): self
+    {
+        $this->depot = $depot;
+
+        return $this;
     }
 }

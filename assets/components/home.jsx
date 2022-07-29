@@ -1,8 +1,7 @@
 import React, { useEffect, Fragment, useState } from 'react'
 import Buttons from './buttons.jsx'
-import Login from './login.jsx'
 import logo from '../../public/ressources/images/logo.png'
-import ButtonAdmin from './buttonAdmin.jsx'
+import ButtonsAdmin from './buttonsAdmin.jsx'
 
 function getImg() {
   let bg = document.querySelector('.js-background')
@@ -15,6 +14,16 @@ function getDepot() {
   return params
 }
 
+//return jwt token if expiration date is valid
+function getTokenStorage() {
+  let object = JSON.parse(localStorage.getItem('urbaconnectToken'))
+  if (object == null) return null
+  let now = new Date().getTime()
+
+  if (now < object.expiration) return object.token
+  return null
+}
+
 function Home() {
   let [error, setError] = useState(false)
   let [token, setToken] = useState()
@@ -22,6 +31,13 @@ function Home() {
   let [buttonsArray, setButtonsArray] = useState([])
   let [depot, setDepot] = useState(null)
   let [background, setBackground] = useState(null)
+
+  //appelé au début de cycle de vie du component, on regarde si l'utilisateur s'est déjà connecté précedemment,
+  //si c'est le cas le token JWT est présent dans le localstorage
+  useEffect(() => {
+    let token = getTokenStorage()
+    setToken(token)
+  }, [])
 
   useEffect(() => {
     setBackground(getImg())
@@ -84,28 +100,33 @@ function Home() {
             </div>
           </div>
         </div>
-        {isLogin() && depot && loaded && (
-          <ButtonAdmin
+        {
+          <ButtonsAdmin
+            depot={depot}
+            loaded={loaded}
             token={token}
             buttonsArray={buttonsArray}
-            depot={depot}
-            setBackground={setBackground}
             setButtonsArray={setButtonsArray}
-          ></ButtonAdmin>
-        )}
+            setBackground={setBackground}
+            setToken={setToken}
+            isLogin={isLogin}
+          />
+        }
       </div>
-      <Login isLogin={isLogin} setToken={setToken} token={token}></Login>
       <footer className="fixed-bottom text-center p-3 ">
         {isLogin() ? (
-          <a
-            href="#"
-            className="link-secondary"
-            onClick={() => {
-              setToken(null)
-            }}
-          >
-            Déconnexion
-          </a>
+          <Fragment>
+            <a
+              href="#"
+              className="link-secondary"
+              onClick={() => {
+                setToken(null)
+                localStorage.removeItem('urbaconnectToken')
+              }}
+            >
+              Déconnexion
+            </a>
+          </Fragment>
         ) : (
           <a
             href="#"
