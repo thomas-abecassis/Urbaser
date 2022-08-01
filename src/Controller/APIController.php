@@ -28,7 +28,7 @@ class APIController extends AbstractController
             /**
      * @Route("/api/admin/resetPassword", name="api_resetPassword")
      */
-    public function resetPassword(Request $request,UserPasswordHasherInterface $passwordHasher){
+    public function resetPassword(Request $request,UserPasswordHasherInterface $hasher){
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
@@ -40,7 +40,7 @@ class APIController extends AbstractController
 
         if ($admin) return $response->setContent(json_encode(array("code" => -3)));
 
-        $hasedPassword = $passwordHasher->hashPassword($admin, self::DEFAULT_PASSWORD);
+        $hasedPassword = $hasher->hashPassword($admin, self::DEFAULT_PASSWORD);
         $admin->setPassword($hasedPassword);
         
         $this->entityManager->persist($admin);
@@ -52,13 +52,12 @@ class APIController extends AbstractController
         /**
      * @Route("/api/admin/createUser", name="api_createUser")
      */
-    public function createUser(Request $request,UserPasswordHasherInterface $passwordHasher){
+    public function createUser(Request $request,UserPasswordHasherInterface $hasher){
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
         $credentials  = json_decode($request->request->get('credentials'));
         $username = $credentials->username;
-
         $repoDepot = $this->entityManager->getRepository(Admin::class);
 
         $admin = $repoDepot->findOneByUsername($username);
@@ -66,11 +65,9 @@ class APIController extends AbstractController
         if ($admin) return $response->setContent(json_encode(array("code" => -3)));
 
         $password = $credentials->password;
-
         $admin = new Admin($username, $password);
-        $hasedPassword = $passwordHasher->hashPassword($admin, $password);
-        $admin->setPassword($hasedPassword);
-        
+
+        //le mot de passe est automatiquement hash par l'event listener 
         $this->entityManager->persist($admin);
         $this->entityManager->flush();
 
