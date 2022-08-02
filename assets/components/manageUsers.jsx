@@ -10,25 +10,25 @@ function ManageUsers(props) {
   })
   let [users, setUsers] = useState([])
 
-  const resetUser = (id) => {
+  const resetUser = (username) => {
     sendData(
       '/api/admin/resetPassword',
-      { credentials: JSON.stringify(credentials), id: id },
+      { credentials: JSON.stringify(credentials), username: username },
       props.token
     ).then((ret) => {
       setReturnCode(ret.code)
     })
   }
 
-  const deleteUser = (id) => {
+  const deleteUser = (username) => {
     sendData(
       '/api/admin/deleteUser',
-      { credentials: JSON.stringify(credentials), id: id },
+      { credentials: JSON.stringify(credentials), username: username },
       props.token
     ).then((ret) => {
       if (ret.code == 1) {
         setReturnCode(2)
-        let newUsers = users.filter((user) => user.id != id)
+        let newUsers = users.filter((user) => user.username != username)
         setUsers(newUsers)
       } else setReturnCode(ret.code)
     })
@@ -90,7 +90,7 @@ function ManageUsers(props) {
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user.id}>
+                  <tr key={user.username}>
                     <th scope="row">{user.id}</th>
                     <td>{user.username}</td>
                     <td>{user.depot}</td>
@@ -99,7 +99,7 @@ function ManageUsers(props) {
                         type="button"
                         className="btn btn-secondary"
                         onClick={() => {
-                          resetUser(user.id)
+                          resetUser(user.username)
                           setReturnCode(0)
                         }}
                       >
@@ -109,7 +109,7 @@ function ManageUsers(props) {
                         type="button"
                         className="btn btn-danger"
                         onClick={() => {
-                          deleteUser(user.id)
+                          deleteUser(user.username)
                           setReturnCode(0)
                         }}
                       >

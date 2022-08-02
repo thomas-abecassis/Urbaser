@@ -3,21 +3,19 @@
 namespace App\EventListener;
 
 use App\Entity\Admin;
-use Psr\Log\LoggerInterface;
+use Doctrine\ORM\Events;
+use App\Entity\AdminDepot;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
-use Doctrine\ORM\Events;
-use Doctrine\Persistence\Event\LifecycleEventArgs;
 
 class ListenerAdmin implements EventSubscriberInterface
 {
 
-    private $logger;
     private $hasher;
 
-    public function __construct( LoggerInterface $logger, UserPasswordHasherInterface $hasher)
+    public function __construct( UserPasswordHasherInterface $hasher)
     {
-        $this->logger = $logger;
         $this->hasher = $hasher;
     }
 
@@ -31,7 +29,7 @@ class ListenerAdmin implements EventSubscriberInterface
 
     private function hashPassword($admin){        
 
-        if (!($admin instanceof Admin)) {
+        if (!($admin instanceof Admin) && !($admin instanceof AdminDepot)) {
             return;
         }
 

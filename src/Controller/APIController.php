@@ -78,11 +78,16 @@ class APIController extends AbstractController
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
-        $id  = json_decode($request->request->get('id'));
+        $username  = $request->request->get('username');
 
-        $repoDepot = $this->entityManager->getRepository(Admin::class);
+        $repoAdmin = $this->entityManager->getRepository(Admin::class);
 
-        $admin = $repoDepot->findOneById($id);
+        $admin = $repoAdmin->findOneByUsername($username);
+
+        if (!$admin){
+            $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
+            $admin = $repoAdminDepot->findOneByUsername($username);
+        }
 
         if (!$admin) return $response->setContent(json_encode(array("code" => -3)));
 
@@ -101,13 +106,19 @@ class APIController extends AbstractController
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
-        $id  = json_decode($request->request->get('id'));
+        $username  = $request->request->get('username');
 
         $repoDepot = $this->entityManager->getRepository(Admin::class);
 
-        $admin = $repoDepot->findOneById($id);
+        $admin = $repoDepot->findOneByUsername($username);
+
+        if (!$admin){
+            $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
+            $admin = $repoAdminDepot->findOneByUsername($username);
+        }
 
         if (!$admin) return $response->setContent(json_encode(array("code" => -3)));
+
         
         $this->entityManager->remove($admin);
         $this->entityManager->flush();
@@ -128,14 +139,18 @@ class APIController extends AbstractController
         $username = $credentials->username;
         $password = $credentials->password;
         $repoAdmin = $this->entityManager->getRepository(Admin::class);
+        $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
+
 
         $admin = $repoAdmin->findOneByUsername($username);
+        if ($admin) return $response->setContent(json_encode(array("code" => -3)));
 
+        $admin = $repoAdminDepot->findOneByUsername($username);
         if ($admin) return $response->setContent(json_encode(array("code" => -3)));
 
         if($adminType==1){
             $repoDepot = $this->entityManager->getRepository(Depot::class);
-            $depot = $repoDepot->findBySlug($depotSlug);
+            $depot = $repoDepot->findOneBySlug($depotSlug);
             $admin = new AdminDepot($username, $password,$depot);
         }
         else if($adminType==2)
@@ -238,6 +253,16 @@ class APIController extends AbstractController
         foreach ($admins as $admin) {
             $adminsJson[] = array("id" => $admin->getId(),"username" => $admin->getUsername(),"depot" => null);
         }
+
+        $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
+        $admins = $repoAdminDepot->findAll();
+
+        foreach ($admins as $admin) {
+            $adminsJson[] = array("id" => $admin->getId(),"username" => $admin->getUsername(),"depot" => $admin->getDepot()->getSlug());
+        }
+
+        if (!$admin) return $response->setContent(json_encode(array("code" => -3)));
+
 
         return $response->setContent(json_encode(array("code" => 1, "users" => $adminsJson)));
     }
