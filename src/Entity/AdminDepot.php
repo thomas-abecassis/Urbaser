@@ -30,6 +30,14 @@ class AdminDepot implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private $depot;
 
+    public function __construct($username = null, $password  = null, $depot  = null)
+    {
+        $this->username=$username;
+        $this->password=$password;
+        $this->depot = $depot;
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;

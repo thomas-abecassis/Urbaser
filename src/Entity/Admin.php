@@ -24,7 +24,7 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string')]
     private $password;
 
-    public function __construct($username, $password)
+    public function __construct($username = null, $password = null)
     {
         $this->username=$username;
         $this->password=$password;

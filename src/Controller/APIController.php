@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Admin;
+use App\Entity\AdminDepot;
 use App\Entity\Depot;
 use App\Entity\Button;
 use Doctrine\Persistence\ManagerRegistry;
@@ -121,16 +122,24 @@ class APIController extends AbstractController
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
-        $credentials  = json_decode($request->request->get('credentials'));
+        $credentials = json_decode($request->request->get('credentials'));
+        $adminType = $request->request->get('adminType');
+        $depotSlug = $request->request->get('depot');
         $username = $credentials->username;
-        $repoDepot = $this->entityManager->getRepository(Admin::class);
+        $password = $credentials->password;
+        $repoAdmin = $this->entityManager->getRepository(Admin::class);
 
-        $admin = $repoDepot->findOneByUsername($username);
+        $admin = $repoAdmin->findOneByUsername($username);
 
         if ($admin) return $response->setContent(json_encode(array("code" => -3)));
 
-        $password = $credentials->password;
-        $admin = new Admin($username, $password);
+        if($adminType==1){
+            $repoDepot = $this->entityManager->getRepository(Depot::class);
+            $depot = $repoDepot->findBySlug($depotSlug);
+            $admin = new AdminDepot($username, $password,$depot);
+        }
+        else if($adminType==2)
+            $admin = new Admin($username, $password);
 
         //le mot de passe est automatiquement hash par l'event listener 
         $this->entityManager->persist($admin);

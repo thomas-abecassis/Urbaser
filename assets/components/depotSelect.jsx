@@ -14,8 +14,7 @@ function DepotSelect(props) {
   }, [])
 
   const handleSelect = (e) => {
-    let depotsFilter = depots.filter((depot) => depot.name == e.target.value)
-    if (depotsFilter.length == 1) props.setDepot(depotsFilter[0].slug)
+    props.setDepot(e.target.value)
   }
 
   return (
@@ -28,7 +27,9 @@ function DepotSelect(props) {
         >
           <option defaultValue>Selection dépot</option>
           {depots.map((depot) => (
-            <option key={depot.slug}>{depot.name}</option>
+            <option key={depot.slug} value={depot.slug}>
+              {depot.name}
+            </option>
           ))}
         </select>
       </div>

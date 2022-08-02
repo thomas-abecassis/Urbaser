@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { sendData } from './Utils.js'
 
 function CreateUser(props) {
+  let [depots, setDepots] = useState([])
+  let [depot, setDepot] = useState()
+  let [adminType, setAdminType] = useState(1)
   let [returnCode, setReturnCode] = useState(0)
   let [credentials, setCredentials] = useState({
     username: '',
     password: '',
   })
 
-  const handleChange = ({ currentTarget }) => {
+  const handleChangeCredentials = ({ currentTarget }) => {
     let { name, value } = currentTarget
     setCredentials({ ...credentials, [name]: value })
   }
@@ -22,12 +25,24 @@ function CreateUser(props) {
   const sendNewUser = () => {
     sendData(
       '/api/admin/createUser',
-      { credentials: JSON.stringify(credentials) },
+      {
+        credentials: JSON.stringify(credentials),
+        adminType: adminType,
+        depot: depot,
+      },
       props.token
     ).then((ret) => {
       setReturnCode(ret.code)
     })
   }
+
+  useEffect(() => {
+    sendData('/api/admin/depots', {}, props.token).then((ret) => {
+      if (ret.code == 1) {
+        setDepots(ret.data)
+      }
+    })
+  }, [])
 
   return (
     <div
@@ -50,6 +65,39 @@ function CreateUser(props) {
           </div>
           <form method="post">
             <div className="modal-body">
+              <label htmlFor="inputAdminType">Type d'administrateur</label>
+              <select
+                className="form-select"
+                aria-label="Default select example"
+                onChange={(e) => {
+                  setAdminType(e.target.value)
+                }}
+              >
+                <option value="1">Admin de dépot</option>
+                <option value="2">Admin</option>
+              </select>
+              {adminType == 1 && (
+                <Fragment>
+                  <label htmlFor=" mt-2 inputAdminType">
+                    Affectation dépot
+                  </label>
+                  <select
+                    className=" form-select"
+                    aria-label="Default select example"
+                    onChange={(e) => {
+                      setDepot(e.target.value)
+                    }}
+                  >
+                    <option defaultValue>Selection dépot</option>
+                    {depots.map((depot) => (
+                      <option key={depot.slug} value={depot.slug}>
+                        {depot.name}
+                      </option>
+                    ))}
+                  </select>
+                </Fragment>
+              )}
+
               <label htmlFor="inputUsername">Nom d'utilisateur</label>
               <input
                 type="text"
@@ -59,7 +107,7 @@ function CreateUser(props) {
                 autoComplete="username"
                 required
                 autoFocus
-                onChange={handleChange}
+                onChange={handleChangeCredentials}
               />
               <label htmlFor="inputPassword">Mot de passe</label>
               <input
@@ -69,7 +117,7 @@ function CreateUser(props) {
                 className="form-control"
                 autoComplete="current-password"
                 required
-                onChange={handleChange}
+                onChange={handleChangeCredentials}
               />
               {returnCode == 1 && (
                 <p className="mt-1 d-block text-success">Utilisateur créé </p>

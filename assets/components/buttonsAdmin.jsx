@@ -58,7 +58,9 @@ function ButtonsAdmin(props) {
         setToken={props.setToken}
         token={props.token}
       ></Login>
-      <CreateUser role={props.role} token={props.token} />
+      {props.isLogin() && props.depot && props.loaded && (
+        <CreateUser role={props.role} token={props.token} />
+      )}
       {props.isLogin() && props.depot && props.loaded && (
         <ManageUsers role={props.role} token={props.token} />
       )}
