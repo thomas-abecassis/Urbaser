@@ -27,6 +27,30 @@ class APIController extends AbstractController
         $this->entityManager = $doctrine->getManager();
     }
 
+        /**
+     * @Route("/api/admin/editUser", name="api_editUser")
+     */
+    public function editUser(Request $request){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        $newPassword  = $request->request->get('newPassword');
+
+        $user = $this->getUser();
+
+        if (!$user) return $response->setContent(json_encode(array("code" => -1)));
+
+        if($newPassword)
+            $user->setPassword($newPassword);
+
+        //le mot de passe est automatiquement hash par l'event listener 
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $response->setContent(json_encode(array("code" => 1)));
+    }
+
+
     /**
      * @Route("/api/admin/role", name="api_role")
      */
@@ -44,6 +68,7 @@ class APIController extends AbstractController
         
         return $response->setContent(json_encode(array("code" => -1)));
     }
+
 
     /**
      * @Route("/api/admin/resetPassword", name="api_resetPassword")

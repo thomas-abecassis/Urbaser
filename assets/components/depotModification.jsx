@@ -72,6 +72,7 @@ function DepotModification(props) {
               )}
               <label className="form-label">Image de fond</label>
               <input
+                id="imageInput"
                 type="file"
                 name="image"
                 className=" mb-3 form-control"
