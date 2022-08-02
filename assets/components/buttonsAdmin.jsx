@@ -9,7 +9,6 @@ function ButtonsAdmin(props) {
     <Fragment>
       {props.isLogin() && props.depot && props.loaded && (
         <Fragment>
-          {' '}
           <div className=" position-absolute bottom-0 end-0 me-5 mb-5">
             <button
               type="button"
@@ -21,11 +20,19 @@ function ButtonsAdmin(props) {
             </button>
             <button
               href="#"
-              className="btn btn-primary btn-lg rounded-pill"
+              className="d-block mb-3 btn btn-primary btn-lg rounded-pill"
               data-bs-toggle="modal"
               data-bs-target="#modalCreateUser"
             >
               Création Compte
+            </button>
+            <button
+              href="#"
+              className="btn btn-primary btn-lg rounded-pill"
+              data-bs-toggle="modal"
+              data-bs-target="#modalManageUser"
+            >
+              Gestion Comptes
             </button>
           </div>
           <DepotModification
@@ -37,9 +44,15 @@ function ButtonsAdmin(props) {
           ></DepotModification>
         </Fragment>
       )}
-      <Login setToken={props.setToken} token={props.token}></Login>
-      <CreateUser token={props.token} />
-      <ManageUsers token={props.token} />
+      <Login
+        setRole={props.setRole}
+        setToken={props.setToken}
+        token={props.token}
+      ></Login>
+      <CreateUser role={props.role} token={props.token} />
+      {props.isLogin() && props.depot && props.loaded && (
+        <ManageUsers role={props.role} token={props.token} />
+      )}
     </Fragment>
   )
 }

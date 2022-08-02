@@ -13,6 +13,8 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class APIController extends AbstractController
 {
@@ -25,23 +27,40 @@ class APIController extends AbstractController
         $this->entityManager = $doctrine->getManager();
     }
 
-            /**
+    /**
+     * @Route("/api/admin/role", name="api_role")
+     */
+    public function role(TokenStorageInterface $tokenStorageInterface){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+        $user = $tokenStorageInterface->getToken()->getUser();
+        $roles = $user->getRoles();
+
+        if (in_array('ROLE_ADMIN',$roles, true))
+        return $response->setContent(json_encode(array("code" => 2)));
+        
+        if (in_array('ROLE_ADMIN_DEPOT',$roles, true))
+            return $response->setContent(json_encode(array("code" => 1)));
+        
+        return $response->setContent(json_encode(array("code" => -1)));
+    }
+
+    /**
      * @Route("/api/admin/resetPassword", name="api_resetPassword")
      */
-    public function resetPassword(Request $request,UserPasswordHasherInterface $hasher){
+    public function resetPassword(Request $request){
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
-        $username  = json_decode($request->request->get('username'));
+        $id  = json_decode($request->request->get('id'));
 
         $repoDepot = $this->entityManager->getRepository(Admin::class);
 
-        $admin = $repoDepot->findOneByUsername($username);
+        $admin = $repoDepot->findOneById($id);
 
-        if ($admin) return $response->setContent(json_encode(array("code" => -3)));
+        if (!$admin) return $response->setContent(json_encode(array("code" => -3)));
 
-        $hasedPassword = $hasher->hashPassword($admin, self::DEFAULT_PASSWORD);
-        $admin->setPassword($hasedPassword);
+        $admin->setPassword(self::DEFAULT_PASSWORD);
         
         $this->entityManager->persist($admin);
         $this->entityManager->flush();
@@ -49,10 +68,31 @@ class APIController extends AbstractController
         return $response->setContent(json_encode(array("code" => 1)));
     }
 
-        /**
+    /**
+     * @Route("/api/admin/deleteUser", name="api_deleteUser")
+     */
+    public function deleteUser(Request $request){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        $id  = json_decode($request->request->get('id'));
+
+        $repoDepot = $this->entityManager->getRepository(Admin::class);
+
+        $admin = $repoDepot->findOneById($id);
+
+        if (!$admin) return $response->setContent(json_encode(array("code" => -3)));
+        
+        $this->entityManager->remove($admin);
+        $this->entityManager->flush();
+
+        return $response->setContent(json_encode(array("code" => 1)));
+    }
+
+    /**
      * @Route("/api/admin/createUser", name="api_createUser")
      */
-    public function createUser(Request $request,UserPasswordHasherInterface $hasher){
+    public function createUser(Request $request){
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
@@ -74,7 +114,9 @@ class APIController extends AbstractController
         return $response->setContent(json_encode(array("code" => 1)));
     }
 
-        /**
+
+
+    /**
      * @Route("/api/admin/uploadImage", name="api_uploadImage")
      */
     public function uploadImage( Request $request, SluggerInterface $slugger)
@@ -113,10 +155,10 @@ class APIController extends AbstractController
         return $response->setContent(json_encode(array("code" => 1, "file" => $newFilename)));
     }
 
-            /**
+    /**
      * @Route("/api/admin/uploadTools", name="api_uploadTools")
      */
-    public function uploadTools( Request $request, SluggerInterface $slugger)
+    public function uploadTools( Request $request)
     {
 
         $response = new Response();
@@ -147,8 +189,8 @@ class APIController extends AbstractController
         return $response->setContent(json_encode(array("code" => 1)));
     }
 
-        /**
-     * @Route("/api/admin/users", name="api_tools")
+    /**
+     * @Route("/api/admin/users", name="api_users")
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getUsers(Request $request){
@@ -156,14 +198,14 @@ class APIController extends AbstractController
         $response->headers->set('Content-Type', 'application/json');
 
         $repoAdmin = $this->entityManager->getRepository(Admin::class);
-        $admins = $repoAdmin->getAll();
+        $admins = $repoAdmin->findAll();
         $adminsJson = array();
 
         foreach ($admins as $admin) {
             $adminsJson[] = array("id" => $admin->getId(),"username" => $admin->getUsername(),"depot" => null);
         }
 
-        return $response->setContent(json_encode($adminsJson));
+        return $response->setContent(json_encode(array("code" => 1, "users" => $adminsJson)));
     }
 
     /**
@@ -172,10 +214,20 @@ class APIController extends AbstractController
      */
     public function getTools($depotSlug)
     {
+        $response = new Response();
+
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+
         $repoDepot = $this->entityManager->getRepository(Depot::class);
 
         $depot = $repoDepot->findOneBySlug($depotSlug);
+
+        if(!$depot)
+            return $response->setContent(json_encode(array("code"=>-1)));
+
         $buttons = $depot->getButtons();
+        $image = $depot->getImage();
 
         $buttonsArray = [];
 
@@ -188,18 +240,14 @@ class APIController extends AbstractController
         }
 
 
-        $response = new Response();
 
-        $response->headers->set('Content-Type', 'application/json');
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-
-        $response->setContent(json_encode($buttonsArray));
+        $response->setContent(json_encode(array("code"=>1,"data" => array("tools" => $buttonsArray, "image" => $image))));
 
         return $response;
     }
 
     /**
-     * @Route("/api/admin/getDepots", name="api_getDepots")
+     * @Route("/api/admin/depots", name="api_depots")
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getDepots(){
@@ -207,13 +255,13 @@ class APIController extends AbstractController
         $response->headers->set('Content-Type', 'application/json');
 
         $repoDepots = $this->entityManager->getRepository(Depot::class);
-        $depots = $repoDepots->getAll();
+        $depots = $repoDepots->findAll();
         $depotsJson = array();
 
         foreach ($depots as $depot) {
-            $depotsJson[] = array("id" => $depot->getId(),"name" => $depot->getName());
+            $depotsJson[] = array("id" => $depot->getId(),"name" => $depot->getName(), "slug" => $depot->getSlug());
         }
 
-        return $response->setContent(json_encode($depotsJson));
+        return $response->setContent(json_encode(array("code" => 1, "data" =>$depotsJson)));
     }
 }

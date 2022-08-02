@@ -1,3 +1,6 @@
+export const ROLE_ADMIN_DEPOT = 1
+export const ROLE_ADMIN = 2
+
 export function sendData(url, data, auth = null) {
   let formData = new FormData()
 

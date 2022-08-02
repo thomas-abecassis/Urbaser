@@ -67,6 +67,7 @@ class Admin implements UserInterface, PasswordAuthenticatedUserInterface
         $roles[] = 'ROLE_USER';
         $roles[] = 'ROLE_ADMIN';
         $roles[] = 'ROLE_ADMIN_DEPOT';
+        $roles[] = 'IS_AUTHENTICATED_FULLY';
         
         return array_unique($roles);
     }

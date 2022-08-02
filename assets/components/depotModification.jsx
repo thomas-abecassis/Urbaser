@@ -8,7 +8,7 @@ function DepotModification(props) {
 
   useEffect(() => {
     setNewButtons(deepCopy(props.buttonsArray)) //deep copy
-  }, [])
+  }, [props.buttonsArray])
 
   const handleClickImage = (event) => {
     event.preventDefault()

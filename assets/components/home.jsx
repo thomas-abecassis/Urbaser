@@ -2,11 +2,8 @@ import React, { useEffect, Fragment, useState } from 'react'
 import Buttons from './buttons.jsx'
 import logo from '../../public/ressources/images/logo.png'
 import ButtonsAdmin from './buttonsAdmin.jsx'
-
-function getImg() {
-  let bg = document.querySelector('.js-background')
-  return bg.dataset.background
-}
+import DepotSelect from './depotSelect.jsx'
+import { ROLE_ADMIN } from './Utils.js'
 
 //get url GET parameters with rewrite (corresponding of our depot)
 function getDepot() {
@@ -31,27 +28,35 @@ function Home() {
   let [buttonsArray, setButtonsArray] = useState([])
   let [depot, setDepot] = useState(null)
   let [background, setBackground] = useState(null)
+  let [role, setRole] = useState(0)
 
   //appelé au début de cycle de vie du component, on regarde si l'utilisateur s'est déjà connecté précedemment,
   //si c'est le cas le token JWT est présent dans le localstorage
   useEffect(() => {
     let token = getTokenStorage()
     setToken(token)
+    let dpt = getDepot()
+    setDepot(dpt)
   }, [])
 
   useEffect(() => {
-    setBackground(getImg())
-
-    let dpt = getDepot()
-    setDepot(dpt)
+    if (!depot) return
+    console.log('je suis trigger : ' + depot)
 
     //à changer en production
-    fetch('/api/tools/' + dpt)
+    fetch('/api/tools/' + depot)
       .then((response) => response.json())
       .then(
         (response) => {
           setLoaded(true)
-          setButtonsArray(response)
+          if (response.code == 1) {
+            setButtonsArray(response.data.tools)
+            setBackground(response.data.image)
+            setError(false)
+          } else {
+            setButtonsArray([])
+            setError(true)
+          }
         },
         (error) => {
           setLoaded(true)
@@ -59,7 +64,7 @@ function Home() {
           setError(true)
         }
       )
-  }, [])
+  }, [depot])
 
   const isLogin = () => {
     return token && token !== -1 && token !== -2
@@ -94,13 +99,16 @@ function Home() {
               Il semblerait que le dépot fournit dans l'URL n'existe pas
             </div>
           )}
+          {role == ROLE_ADMIN && (
+            <DepotSelect token={token} setDepot={setDepot}></DepotSelect>
+          )}
           <div className="row justify-content-md-center align-items-center flex-grow-1">
             <div className="col col-lg-6">
               <Buttons buttonsArray={buttonsArray} loaded={loaded} />
             </div>
           </div>
         </div>
-        {
+        {!error && (
           <ButtonsAdmin
             depot={depot}
             loaded={loaded}
@@ -110,8 +118,10 @@ function Home() {
             setBackground={setBackground}
             setToken={setToken}
             isLogin={isLogin}
+            setRole={setRole}
+            role={role}
           />
-        }
+        )}
       </div>
       <footer className="fixed-bottom text-center p-3 ">
         {isLogin() ? (
@@ -121,6 +131,7 @@ function Home() {
               className="link-secondary"
               onClick={() => {
                 setToken(null)
+                setRole(0)
                 localStorage.removeItem('urbaconnectToken')
               }}
             >

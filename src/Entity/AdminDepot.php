@@ -66,6 +66,8 @@ class AdminDepot implements UserInterface, PasswordAuthenticatedUserInterface
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
         $roles[] = 'ROLE_ADMIN_DEPOT';
+        $roles[] = 'IS_AUTHENTICATED_FULLY';
+
 
         return array_unique($roles);
     }

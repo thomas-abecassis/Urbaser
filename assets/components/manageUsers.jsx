@@ -3,33 +3,46 @@ import { sendData } from './Utils.js'
 
 function ManageUsers(props) {
   let [returnCode, setReturnCode] = useState(0)
+
   let [credentials, setCredentials] = useState({
     username: '',
     password: '',
   })
+  let [users, setUsers] = useState([])
 
-  const handleChange = ({ currentTarget }) => {
-    let { name, value } = currentTarget
-    setCredentials({ ...credentials, [name]: value })
-  }
-
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    setReturnCode(0)
-    sendNewUser()
-  }
-
-  const resetUser = () => {
+  const resetUser = (id) => {
     sendData(
-      '/api/admin/resetUser',
-      { credentials: JSON.stringify(credentials) },
+      '/api/admin/resetPassword',
+      { credentials: JSON.stringify(credentials), id: id },
       props.token
     ).then((ret) => {
       setReturnCode(ret.code)
     })
   }
 
-  useEffect(() => {}, [])
+  const deleteUser = (id) => {
+    sendData(
+      '/api/admin/deleteUser',
+      { credentials: JSON.stringify(credentials), id: id },
+      props.token
+    ).then((ret) => {
+      if (ret.code == 1) {
+        setReturnCode(2)
+        let newUsers = users.filter((user) => user.id != id)
+        setUsers(newUsers)
+      } else setReturnCode(ret.code)
+    })
+  }
+
+  useEffect(() => {
+    sendData(
+      '/api/admin/users',
+      { credentials: JSON.stringify(credentials) },
+      props.token
+    ).then((ret) => {
+      if (ret.code == 1) setUsers(ret.users)
+    })
+  }, [])
 
   return (
     <div
@@ -42,7 +55,7 @@ function ManageUsers(props) {
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Créer un admin</h5>
+            <h5 className="modal-title">Gestion des comptes</h5>
             <button
               type="button"
               className="btn-close"
@@ -50,61 +63,73 @@ function ManageUsers(props) {
               aria-label="Close"
             ></button>
           </div>
-          <form method="post">
-            <div className="modal-body">
-              <label htmlFor="inputUsername">Nom d'utilisateur</label>
-              <input
-                type="text"
-                name="username"
-                id="inputUsername"
-                className="form-control"
-                autoComplete="username"
-                required
-                autoFocus
-                onChange={handleChange}
-              />
-              <label htmlFor="inputPassword">Mot de passe</label>
-              <input
-                type="password"
-                name="password"
-                id="inputPassword"
-                className="form-control"
-                autoComplete="current-password"
-                required
-                onChange={handleChange}
-              />
-              {returnCode == 1 && (
-                <p className="mt-1 d-block text-success">Utilisateur créé </p>
-              )}
-              {returnCode == -1 && (
-                <p className="mt-1 d-block text-danger">
-                  Nom d'utilisateur déjà existant
-                </p>
-              )}
-              {returnCode == -2 && (
-                <p className="mt-1 d-block text-danger">
-                  Problème de communication avec le serveur
-                </p>
-              )}
-            </div>
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Fermer
-              </button>
-              <button
-                onClick={handleSubmit}
-                type="submit"
-                className="btn btn-primary"
-              >
-                Créer l'utilisateur
-              </button>
-            </div>
-          </form>
+          <div className="modal-body">
+            {returnCode == 1 && (
+              <div className="mt-2 alert alert-success" role="alert">
+                Le mot de passe de l'utilisateur a été réinitialiser
+              </div>
+            )}
+            {returnCode == 2 && (
+              <div className="mt-2 alert alert-success" role="alert">
+                L'utilisateur a été supprimé
+              </div>
+            )}
+            {(returnCode == -1 || returnCode == -2 || returnCode == -3) && (
+              <div className="mt-2 alert alert-danger" role="alert">
+                Erreur lors de l'envoi au serveur
+              </div>
+            )}
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Username</th>
+                  <th scope="col">Depot</th>
+                  <th scope="col">Gestion</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id}>
+                    <th scope="row">{user.id}</th>
+                    <td>{user.username}</td>
+                    <td>{user.depot}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => {
+                          resetUser(user.id)
+                          setReturnCode(0)
+                        }}
+                      >
+                        Réinitialiser
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => {
+                          deleteUser(user.id)
+                          setReturnCode(0)
+                        }}
+                      >
+                        Supprimer
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Fermer
+            </button>
+          </div>
         </div>
       </div>
     </div>

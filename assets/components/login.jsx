@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { sendData } from './Utils.js'
 
 function setTokenLocalStorage(token) {
   var object = {
@@ -24,6 +25,12 @@ function Login(props) {
     sendCrentials()
   }
 
+  const getRole = (token) => {
+    sendData('/api/admin/role', {}, token).then((ret) => {
+      if (ret.code != -1) props.setRole(ret.code)
+    })
+  }
+
   //envoit username + mot de passe à l'api, si la combinaison est bonne le serveur renvoie un token JWT et on le set,
   // si elle est mauvaise on set le token a -1, si le serveur a une erreur a -2
   const sendCrentials = () => {
@@ -45,6 +52,7 @@ function Login(props) {
           (json) => {
             //Bon mot de passe
             props.setToken(json.token)
+            getRole(json.token)
           },
           (error) => {
             //erreur du serveur
@@ -57,6 +65,7 @@ function Login(props) {
   //A la deconnexion on retire le token du localstorage
   useEffect(() => {
     if (props.token && props.token !== -1 && props.token !== -2) {
+      getRole(props.token)
       setTokenLocalStorage(props.token)
       let modalLogin = bootstrap.Modal.getInstance(
         document.getElementById('modalLogin')

@@ -4,7 +4,7 @@ import Button from './button.jsx'
 
 function Buttons(props) {
   return props.loaded ? (
-    props.buttonsArray !== -1 && (
+    props.buttonsArray && props.buttonsArray !== -1 && (
       <div className=" d-grid gap-2">
         {props.buttonsArray.map((button) => (
           <Button key={button.id} name={button.name} url={button.url}></Button>
