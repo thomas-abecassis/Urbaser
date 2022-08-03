@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import { sendData } from './Utils.js'
+import { ROLE_ADMIN, sendData } from './Utils.js'
 
 function CreateUser(props) {
   let [depots, setDepots] = useState([])
@@ -65,36 +65,39 @@ function CreateUser(props) {
           </div>
           <form method="post">
             <div className="modal-body">
-              <label htmlFor="inputAdminType">Type d'administrateur</label>
-              <select
-                className="form-select"
-                aria-label="Default select example"
-                onChange={(e) => {
-                  setAdminType(e.target.value)
-                }}
-              >
-                <option value="1">Admin de dépot</option>
-                <option value="2">Admin</option>
-              </select>
-              {adminType == 1 && (
+              {props.role.adminType == ROLE_ADMIN && (
                 <Fragment>
-                  <label htmlFor=" mt-2 inputAdminType">
-                    Affectation dépot
-                  </label>
+                  <label htmlFor="inputAdminType">Type d'administrateur</label>
                   <select
-                    className=" form-select"
+                    className="form-select"
                     aria-label="Default select example"
                     onChange={(e) => {
-                      setDepot(e.target.value)
+                      setAdminType(e.target.value)
                     }}
                   >
-                    <option defaultValue>Selection dépot</option>
-                    {depots.map((depot) => (
-                      <option key={depot.slug} value={depot.slug}>
-                        {depot.name}
-                      </option>
-                    ))}
+                    <option value="1">Admin de dépot</option>
+                    <option value="2">Admin</option>
                   </select>
+                  {adminType == 1 && (
+                    <Fragment>
+                      <label htmlFor=" mt-2 inputAdminType">
+                        Affectation dépot
+                      </label>
+                      <select
+                        className=" form-select"
+                        aria-label="Default select example"
+                        onChange={(e) => {
+                          setDepot(e.target.value)
+                        }}
+                      >
+                        {depots.map((depot) => (
+                          <option key={depot.slug} value={depot.slug}>
+                            {depot.name}
+                          </option>
+                        ))}
+                      </select>
+                    </Fragment>
+                  )}
                 </Fragment>
               )}
 

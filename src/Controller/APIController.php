@@ -29,6 +29,31 @@ class APIController extends AbstractController
     }
 
         /**
+     * @Route("/api/admin/createDepot", name="api_createDepot")
+     */
+    public function createDepot(Request $request){
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        if( !$this->isGranted('ROLE_ADMIN'))   
+            return $response->setContent(json_encode(array("code" => -1)));
+
+        $depotName  = $request->request->get('depotName');
+        $depotSlug  = $request->request->get('depotSlug');
+
+        $repoDepot = $this->entityManager->getRepository(Depot::class);
+        $depot = $repoDepot->findBySlug($depotSlug);
+        if($depot)
+            return $response->setContent(json_encode(array("code" => -3)));
+
+        $depot = new Depot($depotName, $depotSlug);
+        $this->entityManager->persist($depot);
+        $this->entityManager->flush();
+
+        return $response->setContent(json_encode(array("code" => 1)));
+    }
+
+        /**
      * @Route("/api/admin/editUser", name="api_editUser")
      */
     public function editUser(Request $request){
@@ -58,14 +83,14 @@ class APIController extends AbstractController
     public function role(TokenStorageInterface $tokenStorageInterface){
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
-        $user = $tokenStorageInterface->getToken()->getUser();
-        $roles = $user->getRoles();
 
-        if (in_array('ROLE_ADMIN',$roles, true))
-        return $response->setContent(json_encode(array("code" => 2)));
+        if ($this->isGranted('ROLE_ADMIN'))
+            return $response->setContent(json_encode(array("code" => 1, "data" => array("adminType" => 2, "depot" => null))));
         
-        if (in_array('ROLE_ADMIN_DEPOT',$roles, true))
-            return $response->setContent(json_encode(array("code" => 1)));
+        
+        if ($this->isGranted('ROLE_ADMIN_DEPOT'))
+            return $response->setContent(json_encode(array("code" => 1, "data" => array("adminType" => 1, "depot" => $user->getDepot()->getSlug()))));
+        
         
         return $response->setContent(json_encode(array("code" => -1)));
     }
@@ -80,16 +105,19 @@ class APIController extends AbstractController
 
         $username  = $request->request->get('username');
 
-        $repoAdmin = $this->entityManager->getRepository(Admin::class);
+        $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
 
-        $admin = $repoAdmin->findOneByUsername($username);
+        $admin = $repoAdminDepot->findOneByUsername($username);
 
-        if (!$admin){
-            $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
-            $admin = $repoAdminDepot->findOneByUsername($username);
+        if (!$admin  && $this->isGranted('ROLE_ADMIN')){
+            $repoAdmin = $this->entityManager->getRepository(Admin::class);
+            $admin = $repoAdmin->findOneByUsername($username);
         }
 
         if (!$admin) return $response->setContent(json_encode(array("code" => -3)));
+
+        if(!$this->isGranted('ROLE_ADMIN') && $admin->getDepot()->getSlug()!=$this->getUser()->getDepot()->getSlug())
+            return $response->setContent(json_encode(array("code" => -3)));
 
         $admin->setPassword(self::DEFAULT_PASSWORD);
         
@@ -108,17 +136,18 @@ class APIController extends AbstractController
 
         $username  = $request->request->get('username');
 
-        $repoDepot = $this->entityManager->getRepository(Admin::class);
+        $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
 
-        $admin = $repoDepot->findOneByUsername($username);
+        $admin = $repoAdminDepot->findOneByUsername($username);
 
-        if (!$admin){
-            $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
-            $admin = $repoAdminDepot->findOneByUsername($username);
+        if (!$admin  && $this->isGranted('ROLE_ADMIN')){
+            $repoAdmin = $this->entityManager->getRepository(Admin::class);
+            $admin = $repoAdmin->findOneByUsername($username);
         }
 
         if (!$admin) return $response->setContent(json_encode(array("code" => -3)));
-
+        if(!$this->isGranted('ROLE_ADMIN') && $admin->getDepot()->getSlug()!=$this->getUser()->getDepot()->getSlug())
+            return $response->setContent(json_encode(array("code" => -3)));
         
         $this->entityManager->remove($admin);
         $this->entityManager->flush();
@@ -141,6 +170,8 @@ class APIController extends AbstractController
         $repoAdmin = $this->entityManager->getRepository(Admin::class);
         $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
 
+        if($adminType==2 && !$this->isGranted('ROLE_ADMIN'))   
+            return $response->setContent(json_encode(array("code" => -1)));
 
         $admin = $repoAdmin->findOneByUsername($username);
         if ($admin) return $response->setContent(json_encode(array("code" => -3)));
@@ -149,10 +180,14 @@ class APIController extends AbstractController
         if ($admin) return $response->setContent(json_encode(array("code" => -3)));
 
         if($adminType==1){
+            if(!$this->isGranted('ROLE_ADMIN') && $this->getUser()->getDepot()->getSlug()!=$depotSlug)   
+                return $response->setContent(json_encode(array("code" => -1)));
+
             $repoDepot = $this->entityManager->getRepository(Depot::class);
             $depot = $repoDepot->findOneBySlug($depotSlug);
             $admin = new AdminDepot($username, $password,$depot);
         }
+
         else if($adminType==2)
             $admin = new Admin($username, $password);
 
@@ -176,6 +211,10 @@ class APIController extends AbstractController
 
         $image = $request->files->get('image');
         $depotSlug = $request->request->get('depot');
+
+        if(!$this->isGranted('ROLE_ADMIN') && $this->getUser()->getDepot()->getSlug()!=$depotSlug)   
+            return $response->setContent(json_encode(array("code" => -3)));
+
         $repoDepot = $this->entityManager->getRepository(Depot::class);
 
         $depot = $repoDepot->findOneBySlug($depotSlug);
@@ -215,6 +254,9 @@ class APIController extends AbstractController
 
         $depotSlug = $request->request->get('depot');
 
+        if(!$this->isGranted('ROLE_ADMIN') && $this->getUser()->getDepot()->getSlug()!=$depotSlug)   
+            return $response->setContent(json_encode(array("code" => -3))); 
+
         $repoDepot = $this->entityManager->getRepository(Depot::class);
         $repoButton = $this->entityManager->getRepository(Button::class);
 
@@ -242,24 +284,29 @@ class APIController extends AbstractController
      * @Route("/api/admin/users", name="api_users")
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function getUsers(Request $request){
+    public function getUsers(){
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
-        $repoAdmin = $this->entityManager->getRepository(Admin::class);
-        $admins = $repoAdmin->findAll();
         $adminsJson = array();
 
-        foreach ($admins as $admin) {
-            $adminsJson[] = array("id" => $admin->getId(),"username" => $admin->getUsername(),"depot" => null);
-        }
-
         $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
-        $admins = $repoAdminDepot->findAll();
+        $adminsDepot = $repoAdminDepot->findAll();
 
-        foreach ($admins as $admin) {
-            $adminsJson[] = array("id" => $admin->getId(),"username" => $admin->getUsername(),"depot" => $admin->getDepot()->getSlug());
+        foreach ($adminsDepot as $admin) {
+            if($admin!=$this->getUser() && (!$this->isGranted('ROLE_ADMIN') && $admin->getDepot()->getSlug()==$this->getUser()->getDepot()->getSlug() || $this->isGranted('ROLE_ADMIN')))
+                $adminsJson[] = array("id" => $admin->getId(),"username" => $admin->getUsername(),"depot" => $admin->getDepot()->getSlug());
         }
+
+        if($this->isGranted('ROLE_ADMIN')){
+            $repoAdmin = $this->entityManager->getRepository(Admin::class);
+            $admins = $repoAdmin->findAll();
+            foreach ($admins as $admin) {
+                if($admin!=$this->getUser())
+                    $adminsJson[] = array("id" => $admin->getId(),"username" => $admin->getUsername(),"depot" => null);
+            }
+        }
+
 
         if (!$admin) return $response->setContent(json_encode(array("code" => -3)));
 

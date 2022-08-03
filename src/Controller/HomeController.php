@@ -19,20 +19,14 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @Route("/{depotSlug?}", name="app_home")
+     * @Route("/depot/{depotSlug?}", name="app_home")
      */
     public function index($depotSlug): Response
     {
         $repoDepot = $this->entityManager->getRepository(Depot::class);
         $depot = $repoDepot->findOneBySlug($depotSlug);
-        $img = "defaultBackground.jpg";
-        if($depot)
-            $img = $depot->getImage();
-        
 
-        return $this->render('home/index.html.twig', [
-            'img' => $img,
-        ]);
+        return $this->render('home/index.html.twig');
     }
 }
     

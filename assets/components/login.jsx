@@ -27,7 +27,8 @@ function Login(props) {
 
   const getRole = (token) => {
     sendData('/api/admin/role', {}, token).then((ret) => {
-      if (ret.code != -1) props.setRole(ret.code)
+      if (ret.code != -1) props.setRole(ret.data)
+      console.log(ret.data)
     })
   }
 

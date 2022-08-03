@@ -30,10 +30,14 @@ class Depot
     #[ORM\OneToMany(mappedBy: 'depot', targetEntity: AdminDepot::class)]
     private $adminDepots;
 
-    public function __construct()
+
+    public function __construct($name = null, $slug = null)
     {
+        $this->name = $name;
+        $this->slug = $slug;
         $this->buttons = new ArrayCollection();
         $this->adminDepots = new ArrayCollection();
+        $this->image = "defaultBackground.jpg";
     }
 
     public function getId(): ?int

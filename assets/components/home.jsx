@@ -3,11 +3,12 @@ import Buttons from './buttons.jsx'
 import logo from '../../public/ressources/images/logo.png'
 import ButtonsAdmin from './buttonsAdmin.jsx'
 import DepotSelect from './depotSelect.jsx'
-import { ROLE_ADMIN } from './Utils.js'
+import Login from './login.jsx'
+import { ROLE_ADMIN, ROLE_ADMIN_DEPOT } from './Utils.js'
 
 //get url GET parameters with rewrite (corresponding of our depot)
 function getDepot() {
-  var params = window.location.pathname.split('/').slice(1)[0]
+  var params = window.location.pathname.split('/').slice(1)[1]
   return params
 }
 
@@ -28,7 +29,7 @@ function Home() {
   let [buttonsArray, setButtonsArray] = useState([])
   let [depot, setDepot] = useState(null)
   let [background, setBackground] = useState(null)
-  let [role, setRole] = useState(0)
+  let [role, setRole] = useState({ adminType: 0, depot: null })
 
   //appelé au début de cycle de vie du component, on regarde si l'utilisateur s'est déjà connecté précedemment,
   //si c'est le cas le token JWT est présent dans le localstorage
@@ -41,7 +42,6 @@ function Home() {
 
   useEffect(() => {
     if (!depot) return
-    console.log('je suis trigger : ' + depot)
 
     //à changer en production
     fetch('/api/tools/' + depot)
@@ -99,7 +99,7 @@ function Home() {
               Il semblerait que le dépot fournit dans l'URL n'existe pas
             </div>
           )}
-          {role == ROLE_ADMIN && (
+          {role.adminType == ROLE_ADMIN && (
             <DepotSelect token={token} setDepot={setDepot}></DepotSelect>
           )}
           <div className="row justify-content-md-center align-items-center flex-grow-1">
@@ -108,21 +108,24 @@ function Home() {
             </div>
           </div>
         </div>
-        {!error && (
-          <ButtonsAdmin
-            depot={depot}
-            loaded={loaded}
-            token={token}
-            buttonsArray={buttonsArray}
-            setButtonsArray={setButtonsArray}
-            setBackground={setBackground}
-            setToken={setToken}
-            isLogin={isLogin}
-            setRole={setRole}
-            role={role}
-          />
-        )}
+        {!error &&
+          (role.adminType == ROLE_ADMIN ||
+            (role.adminType == ROLE_ADMIN_DEPOT && role.depot == depot)) && (
+            <ButtonsAdmin
+              depot={depot}
+              loaded={loaded}
+              token={token}
+              buttonsArray={buttonsArray}
+              setButtonsArray={setButtonsArray}
+              setBackground={setBackground}
+              setToken={setToken}
+              isLogin={isLogin}
+              setRole={setRole}
+              role={role}
+            />
+          )}
       </div>
+      <Login setRole={setRole} setToken={setToken} token={token}></Login>
       <footer className="fixed-bottom text-center p-3 ">
         {isLogin() ? (
           <Fragment>

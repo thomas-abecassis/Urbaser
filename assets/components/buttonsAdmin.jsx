@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react'
 import DepotModification from './depotModification.jsx'
-import Login from './login.jsx'
 import CreateUser from './createUser.jsx'
 import ManageUsers from './manageUsers.jsx'
 import AccountEdit from './accountEdit.jsx'
+import CreateDepot from './createDepot.jsx'
 
 function ButtonsAdmin(props) {
   return (
@@ -31,6 +31,14 @@ function ButtonsAdmin(props) {
               href="#"
               className="d-block mb-3 btn btn-primary btn-lg rounded-pill"
               data-bs-toggle="modal"
+              data-bs-target="#modalCreateDepot"
+            >
+              Créer dépot
+            </button>
+            <button
+              href="#"
+              className="d-block mb-3 btn btn-primary btn-lg rounded-pill"
+              data-bs-toggle="modal"
               data-bs-target="#modalCreateUser"
             >
               Création Compte
@@ -53,17 +61,13 @@ function ButtonsAdmin(props) {
           ></DepotModification>
         </Fragment>
       )}
-      <Login
-        setRole={props.setRole}
-        setToken={props.setToken}
-        token={props.token}
-      ></Login>
       {props.isLogin() && props.depot && props.loaded && (
         <CreateUser role={props.role} token={props.token} />
       )}
       {props.isLogin() && props.depot && props.loaded && (
         <ManageUsers role={props.role} token={props.token} />
       )}
+      <CreateDepot token={props.token}></CreateDepot>
       <AccountEdit token={props.token}></AccountEdit>
     </Fragment>
   )

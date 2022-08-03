@@ -18,9 +18,6 @@ import Home from './components/Home.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/:depotSlug" element={<Home />} />
-    </Routes>
+    <Home />
   </BrowserRouter>
 )
