@@ -15,9 +15,27 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './components/Home.jsx'
+import logo from '../public/ressources/images/logo.png'
+import LoginForm from './components/loginForm.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
-    <Home />
+    <div className="vh-100 d-flex flex-column">
+      <nav className="navbar navbar-lg navbar-light bg-light">
+        <a className="navbar-brand ms-5" href="#">
+          <img
+            src={logo}
+            width="50"
+            height="50"
+            className="d-inline-block align-top"
+            alt=""
+          />
+        </a>
+      </nav>
+      <Routes>
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/depot/:depotSlug" element={<Home />} />
+      </Routes>
+    </div>
   </BrowserRouter>
 )

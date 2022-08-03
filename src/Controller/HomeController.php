@@ -28,5 +28,15 @@ class HomeController extends AbstractController
 
         return $this->render('home/index.html.twig');
     }
+
+        /**
+     * @Route("/logins", name="app_loginForm")
+     */
+    public function loginForm(): Response
+    {   
+        $tokenProvider = $this->container->get('security.csrf.token_manager');
+        $token = $tokenProvider->getToken('example')->getValue();
+        return $this->render('home/index.html.twig',["crsf" => $token]);
+    }
 }
     

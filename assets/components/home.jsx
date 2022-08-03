@@ -1,6 +1,5 @@
 import React, { useEffect, Fragment, useState } from 'react'
 import Buttons from './buttons.jsx'
-import logo from '../../public/ressources/images/logo.png'
 import ButtonsAdmin from './buttonsAdmin.jsx'
 import DepotSelect from './depotSelect.jsx'
 import Login from './login.jsx'
@@ -72,59 +71,46 @@ function Home() {
 
   return (
     <Fragment>
-      <div className="vh-100 d-flex flex-column">
-        <nav className="navbar navbar-lg navbar-light bg-light">
-          <a className="navbar-brand ms-5" href="#">
-            <img
-              src={logo}
-              width="50"
-              height="50"
-              className="d-inline-block align-top"
-              alt=""
-            />
-          </a>
-        </nav>
-        <div
-          className="container-fluid d-flex flex-column flex-grow-1 bg-image"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/uploads/" +
-              background +
-              "')",
-            backgroundSize: 'cover',
-          }}
-        >
-          {error && (
-            <div className="mt-2 alert alert-danger" role="alert">
-              Il semblerait que le dépot fournit dans l'URL n'existe pas
-            </div>
-          )}
-          {role.adminType == ROLE_ADMIN && (
-            <DepotSelect token={token} setDepot={setDepot}></DepotSelect>
-          )}
-          <div className="row justify-content-md-center align-items-center flex-grow-1">
-            <div className="col col-lg-6">
-              <Buttons buttonsArray={buttonsArray} loaded={loaded} />
-            </div>
+      <div
+        className="container-fluid d-flex flex-column flex-grow-1 bg-image"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/uploads/" +
+            background +
+            "')",
+          backgroundSize: 'cover',
+        }}
+      >
+        {error && (
+          <div className="mt-2 alert alert-danger" role="alert">
+            Il semblerait que le dépot fournit dans l'URL n'existe pas
+          </div>
+        )}
+        {role.adminType == ROLE_ADMIN && (
+          <DepotSelect token={token} setDepot={setDepot}></DepotSelect>
+        )}
+        <div className="row justify-content-md-center align-items-center flex-grow-1">
+          <div className="col col-lg-6">
+            <Buttons buttonsArray={buttonsArray} loaded={loaded} />
           </div>
         </div>
-        {!error &&
-          (role.adminType == ROLE_ADMIN ||
-            (role.adminType == ROLE_ADMIN_DEPOT && role.depot == depot)) && (
-            <ButtonsAdmin
-              depot={depot}
-              loaded={loaded}
-              token={token}
-              buttonsArray={buttonsArray}
-              setButtonsArray={setButtonsArray}
-              setBackground={setBackground}
-              setToken={setToken}
-              isLogin={isLogin}
-              setRole={setRole}
-              role={role}
-            />
-          )}
       </div>
+      {!error &&
+        (role.adminType == ROLE_ADMIN ||
+          (role.adminType == ROLE_ADMIN_DEPOT && role.depot == depot)) && (
+          <ButtonsAdmin
+            depot={depot}
+            loaded={loaded}
+            token={token}
+            buttonsArray={buttonsArray}
+            setButtonsArray={setButtonsArray}
+            setBackground={setBackground}
+            setToken={setToken}
+            isLogin={isLogin}
+            setRole={setRole}
+            role={role}
+          />
+        )}
       <Login setRole={setRole} setToken={setToken} token={token}></Login>
       <footer className="fixed-bottom text-center p-3 ">
         {isLogin() ? (

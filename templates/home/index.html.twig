@@ -3,5 +3,10 @@
 {% block title %}Urbaconnect{% endblock %}
 
 {% block body %}
+{% if crsf is defined %}
+<div class="js-csrf" data-crsf="{{ crsf }}">
+{% endif %}
+    <!-- ... -->
+</div>
 <div id="root"></div>
 {% endblock %}

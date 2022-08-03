@@ -4,6 +4,7 @@ import CreateUser from './createUser.jsx'
 import ManageUsers from './manageUsers.jsx'
 import AccountEdit from './accountEdit.jsx'
 import CreateDepot from './createDepot.jsx'
+import { ROLE_ADMIN } from './Utils.js'
 
 function ButtonsAdmin(props) {
   return (
@@ -27,14 +28,16 @@ function ButtonsAdmin(props) {
             >
               Modifier le site
             </button>
-            <button
-              href="#"
-              className="d-block mb-3 btn btn-primary btn-lg rounded-pill"
-              data-bs-toggle="modal"
-              data-bs-target="#modalCreateDepot"
-            >
-              Créer dépot
-            </button>
+            {props.role == ROLE_ADMIN && (
+              <button
+                href="#"
+                className="d-block mb-3 btn btn-primary btn-lg rounded-pill"
+                data-bs-toggle="modal"
+                data-bs-target="#modalCreateDepot"
+              >
+                Créer dépot
+              </button>
+            )}
             <button
               href="#"
               className="d-block mb-3 btn btn-primary btn-lg rounded-pill"

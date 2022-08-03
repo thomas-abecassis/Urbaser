@@ -89,7 +89,7 @@ class APIController extends AbstractController
         
         
         if ($this->isGranted('ROLE_ADMIN_DEPOT'))
-            return $response->setContent(json_encode(array("code" => 1, "data" => array("adminType" => 1, "depot" => $user->getDepot()->getSlug()))));
+            return $response->setContent(json_encode(array("code" => 1, "data" => array("adminType" => 1, "depot" => $this->getUser()->getDepot()->getSlug()))));
         
         
         return $response->setContent(json_encode(array("code" => -1)));
