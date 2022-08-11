@@ -1,5 +1,4 @@
-import React, { Component, Fragment, useEffect, useState } from 'react'
-import { useLocation, useSearchParams } from 'react-router-dom'
+import React from 'react'
 import Button from './button.jsx'
 
 function Buttons(props) {
@@ -7,7 +6,11 @@ function Buttons(props) {
     props.buttonsArray && props.buttonsArray !== -1 && (
       <div className=" d-grid gap-2">
         {props.buttonsArray.map((button) => (
-          <Button key={button.id} name={button.name} url={button.url}></Button>
+          <Button
+            key={button.id ? button.id : Math.random()}
+            name={button.name}
+            url={button.url}
+          ></Button>
         ))}
       </div>
     )

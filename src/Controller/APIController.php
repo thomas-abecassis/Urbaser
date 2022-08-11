@@ -13,15 +13,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class APIController extends AbstractController
 {
 
     private $entityManager;
-    const DEFAULT_PASSWORD = "EntEnt2022";
+    const DEFAULT_PASSWORD = "95us2e3NCXuF";
 
     public function __construct(ManagerRegistry $doctrine)
     {
@@ -53,7 +51,7 @@ class APIController extends AbstractController
         return $response->setContent(json_encode(array("code" => 1)));
     }
 
-        /**
+    /**
      * @Route("/api/admin/editUser", name="api_editUser")
      */
     public function editUser(Request $request){
@@ -267,13 +265,14 @@ class APIController extends AbstractController
 
         $buttonsUpload = json_decode($request->request->get('tools'));
 
+        $oldButtons = $depot->getButtons();
+        foreach ($oldButtons as  $oldButton) {
+            $this->entityManager->remove($oldButton);
+        }
+
         foreach ($buttonsUpload as  $buttonUpload) {
-            $prevButton = $repoButton->findOneById($buttonUpload->id);
-            if($prevButton){
-                $prevButton->setName($buttonUpload->name);
-                $prevButton->setUrl($buttonUpload->url);
-                $this->entityManager->persist($prevButton);
-            }   
+            $newButtons = new Button($buttonUpload->name, $buttonUpload->url, $depot);
+            $this->entityManager->persist($newButtons);  
         }
         $this->entityManager->flush();
 

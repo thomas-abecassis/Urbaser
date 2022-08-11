@@ -7,7 +7,7 @@ import { ROLE_ADMIN, ROLE_ADMIN_DEPOT } from './Utils.js'
 
 //get url GET parameters with rewrite (corresponding of our depot)
 function getDepot() {
-  var params = window.location.pathname.split('/').slice(1)[1]
+  var params = window.location.pathname.split('/').splice(-1)
   return params
 }
 
@@ -27,7 +27,7 @@ function Home() {
   let [loaded, setLoaded] = useState(false)
   let [buttonsArray, setButtonsArray] = useState([])
   let [depot, setDepot] = useState(null)
-  let [background, setBackground] = useState(null)
+  let [background, setBackground] = useState()
   let [role, setRole] = useState({ adminType: 0, depot: null })
 
   //appelé au début de cycle de vie du component, on regarde si l'utilisateur s'est déjà connecté précedemment,
@@ -42,6 +42,7 @@ function Home() {
   useEffect(() => {
     if (!depot) return
 
+    history.replaceState(null, '', depot)
     //à changer en production
     fetch('/api/tools/' + depot)
       .then((response) => response.json())
@@ -73,71 +74,92 @@ function Home() {
     <Fragment>
       <div
         className="container-fluid d-flex flex-column flex-grow-1 bg-image"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/uploads/" +
-            background +
-            "')",
-          backgroundSize: 'cover',
-        }}
+        style={
+          background
+            ? {
+                backgroundImage:
+                  "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/uploads/" +
+                  background +
+                  "')",
+                backgroundSize: 'cover',
+              }
+            : {
+                backgroundImage:
+                  "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/uploads/defaultBackground.jpg')",
+                backgroundSize: 'cover',
+              }
+        }
       >
-        {error && (
-          <div className="mt-2 alert alert-danger" role="alert">
-            Il semblerait que le dépot fournit dans l'URL n'existe pas
+        <div className="position-absolute w-100 mt-2 row justify-content-md-center">
+          <div className="container">
+            {error && (
+              <div className="mt-2 alert alert-danger" role="alert">
+                Il semblerait que le dépot fournit dans l'URL n'existe pas
+              </div>
+            )}
           </div>
-        )}
-        {role.adminType == ROLE_ADMIN && (
-          <DepotSelect token={token} setDepot={setDepot}></DepotSelect>
-        )}
+          <div className="col col-lg-6">
+            {role.adminType == ROLE_ADMIN && (
+              <DepotSelect
+                token={token}
+                setDepot={setDepot}
+                depot={depot}
+              ></DepotSelect>
+            )}
+          </div>
+        </div>
         <div className="row justify-content-md-center align-items-center flex-grow-1">
           <div className="col col-lg-6">
             <Buttons buttonsArray={buttonsArray} loaded={loaded} />
+            {!error &&
+              (role.adminType == ROLE_ADMIN ||
+                (role.adminType == ROLE_ADMIN_DEPOT &&
+                  role.depot == depot)) && (
+                <ButtonsAdmin
+                  depot={depot}
+                  loaded={loaded}
+                  token={token}
+                  buttonsArray={buttonsArray}
+                  setButtonsArray={setButtonsArray}
+                  setBackground={setBackground}
+                  setToken={setToken}
+                  isLogin={isLogin}
+                  setRole={setRole}
+                  role={role}
+                  setDepot={setDepot}
+                />
+              )}
           </div>
         </div>
-      </div>
-      {!error &&
-        (role.adminType == ROLE_ADMIN ||
-          (role.adminType == ROLE_ADMIN_DEPOT && role.depot == depot)) && (
-          <ButtonsAdmin
-            depot={depot}
-            loaded={loaded}
-            token={token}
-            buttonsArray={buttonsArray}
-            setButtonsArray={setButtonsArray}
-            setBackground={setBackground}
-            setToken={setToken}
-            isLogin={isLogin}
-            setRole={setRole}
-            role={role}
-          />
-        )}
-      <Login setRole={setRole} setToken={setToken} token={token}></Login>
-      <footer className="fixed-bottom text-center p-3 ">
-        {isLogin() ? (
-          <Fragment>
+
+        <Login setRole={setRole} setToken={setToken} token={token}></Login>
+        <div className="mt-auto text-center p-3 ">
+          {isLogin() ? (
+            <Fragment>
+              <a
+                href="#"
+                className="link-secondary"
+                onClick={() => {
+                  setToken(null)
+                  setRole(0)
+                  localStorage.removeItem('urbaconnectToken')
+                }}
+              >
+                Déconnexion
+              </a>
+            </Fragment>
+          ) : (
             <a
               href="#"
               className="link-secondary"
-              onClick={() => {
-                setToken(null)
-                setRole(0)
-                localStorage.removeItem('urbaconnectToken')
-              }}
+              data-bs-toggle="modal"
+              data-bs-target="#modalLogin"
             >
-              Déconnexion
+              Connexion
             </a>
-          </Fragment>
-        ) : (
-          <a
-            href="#"
-            className="link-secondary"
-            data-bs-toggle="modal"
-            data-bs-target="#modalLogin"
-          >
-            Connexion
-          </a>
-        )}
-      </footer>
+          )}
+        </div>
+      </div>
     </Fragment>
   )
 }

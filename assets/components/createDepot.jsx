@@ -1,5 +1,5 @@
-import React, { Fragment, useEffect, useState } from 'react'
-import { ROLE_ADMIN, sendData } from './Utils.js'
+import React, { useState } from 'react'
+import { sendData } from './Utils.js'
 import slugify from 'react-slugify'
 
 function CreateDepot(props) {
@@ -23,6 +23,7 @@ function CreateDepot(props) {
       props.token
     ).then((ret) => {
       setReturnCode(ret.code)
+      if (ret.code == 1) props.setDepot(depotSlug)
     })
   }
 

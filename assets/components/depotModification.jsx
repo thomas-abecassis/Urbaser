@@ -1,5 +1,7 @@
-import React, { Component, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { deepCopy, deepComparison, sendData } from './Utils.js'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
 
 function DepotModification(props) {
   const [image, setImage] = useState(null)
@@ -24,6 +26,12 @@ function DepotModification(props) {
         setImage(null)
       }
     })
+  }
+
+  const addTool = () => {
+    let arrCopy = [...newButtons]
+    arrCopy.push({ name: '', url: '', id: 'button' + Math.random() })
+    setNewButtons(arrCopy)
   }
 
   const handleClickTools = (event) => {
@@ -55,7 +63,7 @@ function DepotModification(props) {
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Modifier site</h5>
+            <h5 className="modal-title">Modifier le site</h5>
             <button
               type="button"
               className="btn-close"
@@ -125,13 +133,32 @@ function DepotModification(props) {
                       setNewButtons(arrCopy)
                     }}
                   />
+                  <button
+                    className="btn btn-danger"
+                    onClick={(event) => {
+                      event.preventDefault()
+                      let arrCopy = [...newButtons]
+                      arrCopy.splice(index, 1)
+                      setNewButtons(arrCopy)
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faXmark} />
+                  </button>
                 </div>
               ))}
-              {!deepComparison(props.buttonsArray, newButtons) && (
+
+              {!deepComparison(props.buttonsArray, newButtons) ? (
                 <div className="d-block">
                   <button
                     type="button"
-                    className=" mb-3 me-2 btn btn-secondary"
+                    className=" mb-3 me-2 btn btn-primary"
+                    onClick={addTool}
+                  >
+                    ajouter outil
+                  </button>
+                  <button
+                    type="button"
+                    className=" mb-3 me-2 btn btn-success"
                     onClick={handleClickTools}
                   >
                     Valider
@@ -143,6 +170,16 @@ function DepotModification(props) {
                     className="mb-3 btn btn-danger"
                   >
                     Annuler
+                  </button>
+                </div>
+              ) : (
+                <div className="d-block">
+                  <button
+                    type="button"
+                    className=" mb-3 me-2 btn btn-primary"
+                    onClick={addTool}
+                  >
+                    ajouter outil
                   </button>
                 </div>
               )}

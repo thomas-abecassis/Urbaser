@@ -21,23 +21,23 @@ class Depot
     #[ORM\Column(type: 'string', length: 255)]
     private $slug;
 
-    #[ORM\ManyToMany(targetEntity: Button::class, mappedBy: 'depot')]
-    private $buttons;
-
     #[ORM\Column(type: 'string', length: 255)]
     private $image;
 
     #[ORM\OneToMany(mappedBy: 'depot', targetEntity: AdminDepot::class)]
     private $adminDepots;
 
+    #[ORM\OneToMany(mappedBy: 'depot', targetEntity: Button::class, orphanRemoval: true)]
+    private $buttons;
+
 
     public function __construct($name = null, $slug = null)
     {
         $this->name = $name;
         $this->slug = $slug;
-        $this->buttons = new ArrayCollection();
         $this->adminDepots = new ArrayCollection();
         $this->image = "defaultBackground.jpg";
+        $this->buttons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -65,33 +65,6 @@ class Depot
     public function setSlug(string $slug): self
     {
         $this->slug = $slug;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Button>
-     */
-    public function getButtons(): Collection
-    {
-        return $this->buttons;
-    }
-
-    public function addButton(Button $button): self
-    {
-        if (!$this->buttons->contains($button)) {
-            $this->buttons[] = $button;
-            $button->addDepot($this);
-        }
-
-        return $this;
-    }
-
-    public function removeButton(Button $button): self
-    {
-        if ($this->buttons->removeElement($button)) {
-            $button->removeDepot($this);
-        }
 
         return $this;
     }
@@ -137,6 +110,36 @@ class Depot
             // set the owning side to null (unless already changed)
             if ($adminDepot->getDepot() === $this) {
                 $adminDepot->setDepot(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Button>
+     */
+    public function getButtons(): Collection
+    {
+        return $this->buttons;
+    }
+
+    public function addButton(Button $button): self
+    {
+        if (!$this->buttons->contains($button)) {
+            $this->buttons[] = $button;
+            $button->setDepot($this);
+        }
+
+        return $this;
+    }
+
+    public function removeButton(Button $button): self
+    {
+        if ($this->buttons->removeElement($button)) {
+            // set the owning side to null (unless already changed)
+            if ($button->getDepot() === $this) {
+                $button->setDepot(null);
             }
         }
 

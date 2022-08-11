@@ -16,7 +16,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './components/Home.jsx'
 import logo from '../public/ressources/images/logo.png'
-import LoginForm from './components/loginForm.jsx'
+import NotFound from './components/notFound.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -33,8 +33,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </a>
       </nav>
       <Routes>
-        <Route path="/login" element={<LoginForm />} />
         <Route path="/depot/:depotSlug" element={<Home />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   </BrowserRouter>

@@ -3,17 +3,12 @@ import { sendData } from './Utils.js'
 
 function ManageUsers(props) {
   let [returnCode, setReturnCode] = useState(0)
-
-  let [credentials, setCredentials] = useState({
-    username: '',
-    password: '',
-  })
   let [users, setUsers] = useState([])
 
   const resetUser = (username) => {
     sendData(
       '/api/admin/resetPassword',
-      { credentials: JSON.stringify(credentials), username: username },
+      { username: username },
       props.token
     ).then((ret) => {
       setReturnCode(ret.code)
@@ -21,25 +16,19 @@ function ManageUsers(props) {
   }
 
   const deleteUser = (username) => {
-    sendData(
-      '/api/admin/deleteUser',
-      { credentials: JSON.stringify(credentials), username: username },
-      props.token
-    ).then((ret) => {
-      if (ret.code == 1) {
-        setReturnCode(2)
-        let newUsers = users.filter((user) => user.username != username)
-        setUsers(newUsers)
-      } else setReturnCode(ret.code)
-    })
+    sendData('/api/admin/deleteUser', { username: username }, props.token).then(
+      (ret) => {
+        if (ret.code == 1) {
+          setReturnCode(2)
+          let newUsers = users.filter((user) => user.username != username)
+          setUsers(newUsers)
+        } else setReturnCode(ret.code)
+      }
+    )
   }
 
   useEffect(() => {
-    sendData(
-      '/api/admin/users',
-      { credentials: JSON.stringify(credentials) },
-      props.token
-    ).then((ret) => {
+    sendData('/api/admin/users', {}, props.token).then((ret) => {
       if (ret.code == 1) setUsers(ret.users)
     })
   }, [])
@@ -66,7 +55,7 @@ function ManageUsers(props) {
           <div className="modal-body">
             {returnCode == 1 && (
               <div className="mt-2 alert alert-success" role="alert">
-                Le mot de passe de l'utilisateur a été réinitialiser
+                Le mot de passe de l'utilisateur a été réinitialisé
               </div>
             )}
             {returnCode == 2 && (
@@ -83,7 +72,9 @@ function ManageUsers(props) {
               <thead>
                 <tr>
                   <th scope="col">#</th>
-                  <th scope="col">Username</th>
+                  <th style={{ whiteSpace: 'nowrap' }} scope="col">
+                    Comptes
+                  </th>
                   <th scope="col">Depot</th>
                   <th scope="col">Gestion</th>
                 </tr>

@@ -5,56 +5,49 @@ import ManageUsers from './manageUsers.jsx'
 import AccountEdit from './accountEdit.jsx'
 import CreateDepot from './createDepot.jsx'
 import { ROLE_ADMIN } from './Utils.js'
+import ButtonAdmin from './buttonAdmin.jsx'
 
 function ButtonsAdmin(props) {
+  const buttons = (isLarge) => (
+    <Fragment>
+      <ButtonAdmin
+        isLarge={isLarge}
+        name="Modifier mon compte"
+        modalName="#modalUserEdit"
+      />
+      <ButtonAdmin
+        isLarge={isLarge}
+        name="Modifier le site"
+        modalName="#modalAdmin"
+      />
+      {props.role.adminType == ROLE_ADMIN && (
+        <ButtonAdmin
+          isLarge={isLarge}
+          name="Créer dépôt"
+          modalName="#modalCreateDepot"
+        />
+      )}
+      <ButtonAdmin
+        isLarge={isLarge}
+        name="Créer compte"
+        modalName="#modalCreateUser"
+      />
+      <ButtonAdmin
+        isLarge={isLarge}
+        name="Gérer comptes"
+        modalName="#modalManageUser"
+      />
+    </Fragment>
+  )
+
   return (
     <Fragment>
       {props.isLogin() && props.depot && props.loaded && (
         <Fragment>
-          <div className=" position-absolute bottom-0 end-0 me-5 mb-5">
-            <button
-              type="button"
-              className="d-block mb-3 btn btn-primary btn-lg rounded-pill"
-              data-bs-toggle="modal"
-              data-bs-target="#modalUserEdit"
-            >
-              Modifier mon compte
-            </button>
-            <button
-              type="button"
-              className="d-block mb-3 btn btn-primary btn-lg rounded-pill"
-              data-bs-toggle="modal"
-              data-bs-target="#modalAdmin"
-            >
-              Modifier le site
-            </button>
-            {props.role == ROLE_ADMIN && (
-              <button
-                href="#"
-                className="d-block mb-3 btn btn-primary btn-lg rounded-pill"
-                data-bs-toggle="modal"
-                data-bs-target="#modalCreateDepot"
-              >
-                Créer dépot
-              </button>
-            )}
-            <button
-              href="#"
-              className="d-block mb-3 btn btn-primary btn-lg rounded-pill"
-              data-bs-toggle="modal"
-              data-bs-target="#modalCreateUser"
-            >
-              Création Compte
-            </button>
-            <button
-              href="#"
-              className="btn btn-primary btn-lg rounded-pill"
-              data-bs-toggle="modal"
-              data-bs-target="#modalManageUser"
-            >
-              Gestion Comptes
-            </button>
+          <div className="d-none d-lg-block position-absolute bottom-0 end-0 me-4 mb-5">
+            {buttons(true)}
           </div>
+          <div className=" d-lg-none d-grid gap-2">{buttons(false)}</div>
           <DepotModification
             token={props.token}
             buttonsArray={props.buttonsArray}
@@ -70,7 +63,7 @@ function ButtonsAdmin(props) {
       {props.isLogin() && props.depot && props.loaded && (
         <ManageUsers role={props.role} token={props.token} />
       )}
-      <CreateDepot token={props.token}></CreateDepot>
+      <CreateDepot setDepot={props.setDepot} token={props.token}></CreateDepot>
       <AccountEdit token={props.token}></AccountEdit>
     </Fragment>
   )

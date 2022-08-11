@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ButtonRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ButtonRepository::class)]
@@ -21,12 +19,15 @@ class Button
     #[ORM\Column(type: 'string', length: 255)]
     private $url;
 
-    #[ORM\ManyToMany(targetEntity: Depot::class, inversedBy: 'buttons')]
+    #[ORM\ManyToOne(targetEntity: Depot::class, inversedBy: 'buttons')]
+    #[ORM\JoinColumn(nullable: false)]
     private $depot;
 
-    public function __construct()
+    public function __construct($name =null, $url = null, $depot = null)
     {
-        $this->depot = new ArrayCollection();
+        $this->name = $name;
+        $this->url = $url;
+        $this->depot = $depot;
     }
 
     public function getId(): ?int
@@ -58,32 +59,15 @@ class Button
         return $this;
     }
 
-    /**
-     * @return Collection<int, Depot>
-     */
-    public function getDepot(): Collection
+    public function getDepot(): ?depot
     {
         return $this->depot;
     }
 
-    public function addDepot(Depot $depot): self
+    public function setDepot(?depot $depot): self
     {
-        if (!$this->depot->contains($depot)) {
-            $this->depot[] = $depot;
-        }
+        $this->depot = $depot;
 
         return $this;
-    }
-
-    public function removeDepot(Depot $depot): self
-    {
-        $this->depot->removeElement($depot);
-
-        return $this;
-    }
-
-    public function __toString()
-    {
-        return $this->getUrl();
     }
 }
