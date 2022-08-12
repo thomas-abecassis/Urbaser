@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useState } from 'react'
 import DepotModification from './depotModification.jsx'
 import CreateUser from './createUser.jsx'
 import ManageUsers from './manageUsers.jsx'
@@ -8,6 +8,8 @@ import { ROLE_ADMIN } from './Utils.js'
 import ButtonAdmin from './buttonAdmin.jsx'
 
 function ButtonsAdmin(props) {
+  let [newUserCreated, setNewUserCreated] = useState()
+
   const buttons = (isLarge) => (
     <Fragment>
       <ButtonAdmin
@@ -58,10 +60,19 @@ function ButtonsAdmin(props) {
         </Fragment>
       )}
       {props.isLogin() && props.depot && props.loaded && (
-        <CreateUser role={props.role} token={props.token} />
+        <CreateUser
+          setNewUserCreated={setNewUserCreated}
+          role={props.role}
+          token={props.token}
+          depot={props.depot}
+        />
       )}
       {props.isLogin() && props.depot && props.loaded && (
-        <ManageUsers role={props.role} token={props.token} />
+        <ManageUsers
+          newUserCreated={newUserCreated}
+          role={props.role}
+          token={props.token}
+        />
       )}
       <CreateDepot setDepot={props.setDepot} token={props.token}></CreateDepot>
       <AccountEdit token={props.token}></AccountEdit>

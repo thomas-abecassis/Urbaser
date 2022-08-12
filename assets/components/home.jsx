@@ -39,6 +39,7 @@ function Home() {
     setDepot(dpt)
   }, [])
 
+  //quand on change de dépot on met à jour la liste d'outils + modifie l'url du navigateur
   useEffect(() => {
     if (!depot) return
 

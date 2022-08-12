@@ -9,7 +9,7 @@ function DepotModification(props) {
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    setNewButtons(deepCopy(props.buttonsArray)) //deep copy
+    setNewButtons(deepCopy(props.buttonsArray))
   }, [props.buttonsArray])
 
   const handleClickImage = (event) => {
@@ -92,7 +92,7 @@ function DepotModification(props) {
                 <div className="d-block">
                   <button
                     type="button"
-                    className=" mb-3 me-2 btn btn-secondary"
+                    className=" mb-3 me-2 btn btn-primary"
                     onClick={handleClickImage}
                   >
                     Valider

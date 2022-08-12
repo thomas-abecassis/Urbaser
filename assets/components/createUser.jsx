@@ -1,5 +1,10 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import { ROLE_ADMIN, sendData } from './Utils.js'
+import {
+  ROLE_ADMIN,
+  sendData,
+  checkPasswordStrength,
+  ROLE_ADMIN_DEPOT,
+} from './Utils.js'
 
 function CreateUser(props) {
   let [depots, setDepots] = useState([])
@@ -23,16 +28,20 @@ function CreateUser(props) {
   }
 
   const sendNewUser = () => {
+    let dep = depot
+    if (props.role.adminType == ROLE_ADMIN_DEPOT) dep = props.role.depot
     sendData(
       '/api/admin/createUser',
       {
         credentials: JSON.stringify(credentials),
         adminType: adminType,
-        depot: depot,
+        depot: dep,
       },
       props.token
     ).then((ret) => {
       setReturnCode(ret.code)
+      if (ret.code == 1) props.setNewUserCreated(true)
+      else props.setNewUserCreated(false)
     })
   }
 
@@ -42,7 +51,7 @@ function CreateUser(props) {
         setDepots(ret.data)
       }
     })
-  }, [])
+  }, [props.depot])
 
   return (
     <div
@@ -122,6 +131,12 @@ function CreateUser(props) {
                 required
                 onChange={handleChangeCredentials}
               />
+              {!checkPasswordStrength(credentials.password) && (
+                <p className="mt-1 d-block text-danger">
+                  Le mot de passe doit faire plus de 7 caractères et contenir au
+                  moins une minuscule et majuscule
+                </p>
+              )}
               {returnCode == 1 && (
                 <p className="mt-1 d-block text-success">Utilisateur créé </p>
               )}
@@ -150,13 +165,16 @@ function CreateUser(props) {
               >
                 Fermer
               </button>
-              <button
-                onClick={handleSubmit}
-                type="submit"
-                className="btn btn-primary"
-              >
-                Créer l'utilisateur
-              </button>
+              {checkPasswordStrength(credentials.password) &&
+                credentials.username && (
+                  <button
+                    onClick={handleSubmit}
+                    type="submit"
+                    className="btn btn-primary"
+                  >
+                    Créer l'utilisateur
+                  </button>
+                )}
             </div>
           </form>
         </div>

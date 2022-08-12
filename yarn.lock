@@ -4913,7 +4913,7 @@
     "iconv-lite" "0.4.24"
     "unpipe" "1.0.0"
 
-"react-dom@^18.2.0", "react-dom@>=16.8":
+"react-dom@^18.2.0", "react-dom@>=16.8", "react-dom@>=16.8.6":
   "integrity" "sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g=="
   "resolved" "https://registry.npmjs.org/react-dom/-/react-dom-18.2.0.tgz"
   "version" "18.2.0"
@@ -4925,6 +4925,13 @@
   "integrity" "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   "version" "16.13.1"
+
+"react-password-strength-bar@^0.4.1":
+  "integrity" "sha512-2NvYz4IUU8k7KDZgsXKoJWreKCZLKGaqF5QhIVhc09OsPBFXFMh0BeghNkBIRkaxLeI7/xjivknDCYfluBCXKA=="
+  "resolved" "https://registry.npmjs.org/react-password-strength-bar/-/react-password-strength-bar-0.4.1.tgz"
+  "version" "0.4.1"
+  dependencies:
+    "zxcvbn" "4.4.2"
 
 "react-router-dom@^6.3.0":
   "integrity" "sha512-uaJj7LKytRxZNQV8+RbzJWnJ8K2nPsOOEuX7aQstlMZKQT0164C+X2w6bnkqU3sjtLvpd5ojrezAyfZ1+0sStw=="
@@ -4946,7 +4953,7 @@
   "resolved" "https://registry.npmjs.org/react-slugify/-/react-slugify-2.1.0.tgz"
   "version" "2.1.0"
 
-"react@^18.2.0", "react@>=16.3", "react@>=16.8":
+"react@^18.2.0", "react@>=16.3", "react@>=16.8", "react@>=16.8.6":
   "integrity" "sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ=="
   "resolved" "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   "version" "18.2.0"
@@ -6256,3 +6263,8 @@
     "string-width" "^4.2.3"
     "y18n" "^5.0.5"
     "yargs-parser" "^21.0.0"
+
+"zxcvbn@4.4.2":
+  "integrity" "sha512-Bq0B+ixT/DMyG8kgX2xWcI5jUvCwqrMxSFam7m0lAf78nf04hv6lNCsyLYdyYTrCVMqNDY/206K7eExYCeSyUQ=="
+  "resolved" "https://registry.npmjs.org/zxcvbn/-/zxcvbn-4.4.2.tgz"
+  "version" "4.4.2"

@@ -3,13 +3,14 @@ import { sendData } from './Utils.js'
 
 function DepotSelect(props) {
   let [depots, setDepots] = useState([])
+  let [depotCourant, setDepotCourant] = useState()
 
+  //On met à jour la liste de dépots du select + setDepotCourant
   useEffect(() => {
-    let findDepot = depots.find((depot) => depot.slug == props.depot)
-    if (findDepot) return
     sendData('/api/admin/depots', {}, props.token).then((ret) => {
       if (ret.code == 1) {
         setDepots(ret.data)
+        setDepotCourant(ret.data.find((depot) => depot.slug == props.depot))
       }
     })
   }, [props.depot])
@@ -18,22 +19,21 @@ function DepotSelect(props) {
     props.setDepot(e.target.value)
   }
 
-  let findDepot = depots.find((depot) => depot.slug == props.depot)
-
   return (
     <select
       className=" form-select "
       aria-label="Default select example"
       onChange={handleSelect}
+      value={depotCourant && depotCourant.slug}
     >
-      {findDepot && (
-        <option key={findDepot.slug} value={findDepot.slug}>
-          {findDepot.name}
+      {depotCourant && (
+        <option key={depotCourant.slug} value={depotCourant.slug}>
+          {depotCourant.name}
         </option>
       )}
       {depots.map(
         (depot) =>
-          (!findDepot || findDepot.slug != depot.slug) && (
+          (!depotCourant || depotCourant.slug != depot.slug) && (
             <option key={depot.slug} value={depot.slug}>
               {depot.name}
             </option>

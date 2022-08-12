@@ -27,11 +27,14 @@ function ManageUsers(props) {
     )
   }
 
+  //On met à jour la liste d'utilisateur si on est au premier render ou si un nouveau utilisateur a été créé
   useEffect(() => {
-    sendData('/api/admin/users', {}, props.token).then((ret) => {
-      if (ret.code == 1) setUsers(ret.users)
-    })
-  }, [])
+    if (props.newUserCreated != false) {
+      sendData('/api/admin/users', {}, props.token).then((ret) => {
+        if (ret.code == 1) setUsers(ret.users)
+      })
+    }
+  }, [props.newUserCreated])
 
   return (
     <div

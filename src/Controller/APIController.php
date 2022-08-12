@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Admin;
-use App\Entity\AdminDepot;
 use App\Entity\Depot;
 use App\Entity\Button;
+use App\Entity\AdminDepot;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,13 +13,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class APIController extends AbstractController
 {
 
     private $entityManager;
-    const DEFAULT_PASSWORD = "95us2e3NCXuF";
+    const DEFAULT_PASSWORD = "z249CP&#&4%x";
 
     public function __construct(ManagerRegistry $doctrine)
     {
@@ -54,15 +54,22 @@ class APIController extends AbstractController
     /**
      * @Route("/api/admin/editUser", name="api_editUser")
      */
-    public function editUser(Request $request){
+    public function editUser(Request $request,  UserPasswordHasherInterface $hasher){
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
         $newPassword  = $request->request->get('newPassword');
+        $oldPassword  = $request->request->get('oldPassword');
+
 
         $user = $this->getUser();
 
-        if (!$user) return $response->setContent(json_encode(array("code" => -1)));
+        if (!$user) 
+            return $response->setContent(json_encode(array("code" => -1)));
+        if (!(strlen($newPassword) > 7 && preg_match('/[A-Z]/', $newPassword) && preg_match('/[a-z]/', $newPassword)))
+            return $response->setContent(json_encode(array("code" => -1)));
+        if (!$hasher->isPasswordValid($user, $oldPassword))
+            return $response->setContent(json_encode(array("code" => -2)));
 
         if($newPassword)
             $user->setPassword($newPassword);
@@ -78,7 +85,7 @@ class APIController extends AbstractController
     /**
      * @Route("/api/admin/role", name="api_role")
      */
-    public function role(TokenStorageInterface $tokenStorageInterface){
+    public function role(){
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
 
@@ -168,6 +175,7 @@ class APIController extends AbstractController
         $repoAdmin = $this->entityManager->getRepository(Admin::class);
         $repoAdminDepot = $this->entityManager->getRepository(AdminDepot::class);
 
+
         if($adminType==2 && !$this->isGranted('ROLE_ADMIN'))   
             return $response->setContent(json_encode(array("code" => -1)));
 
@@ -177,8 +185,11 @@ class APIController extends AbstractController
         $admin = $repoAdminDepot->findOneByUsername($username);
         if ($admin) return $response->setContent(json_encode(array("code" => -3)));
 
+        if (!$username || !(strlen($password) > 7 && preg_match('/[A-Z]/', $password) && preg_match('/[a-z]/', $password)))
+        return $response->setContent(json_encode(array("code" => -1)));
+
         if($adminType==1){
-            if(!$this->isGranted('ROLE_ADMIN') && $this->getUser()->getDepot()->getSlug()!=$depotSlug)   
+            if(!$this->isGranted('ROLE_ADMIN') && $this->getUser()->getDepot()->getSlug()!=$depotSlug || !$depotSlug)   
                 return $response->setContent(json_encode(array("code" => -1)));
 
             $repoDepot = $this->entityManager->getRepository(Depot::class);

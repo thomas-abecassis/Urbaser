@@ -1,6 +1,15 @@
 export const ROLE_ADMIN_DEPOT = 1
 export const ROLE_ADMIN = 2
 
+export function checkPasswordStrength(password) {
+  let passwordArray = Array.from(password)
+  let sup7 = passwordArray.length > 7
+  let hasMaj = passwordArray.some((c) => c === c.toUpperCase())
+  let hasMin = passwordArray.some((c) => c === c.toLowerCase())
+  if (hasMin && hasMaj && sup7) return true
+  return false
+}
+
 export function sendData(url, data, auth = null) {
   let formData = new FormData()
 
