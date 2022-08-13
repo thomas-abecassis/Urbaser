@@ -19,7 +19,7 @@ class APIController extends AbstractController
 {
 
     private $entityManager;
-    const DEFAULT_PASSWORD = "z249CP&#&4%x";
+    const DEFAULT_PASSWORD = "95us2e3NCXuF";
 
     public function __construct(ManagerRegistry $doctrine)
     {
